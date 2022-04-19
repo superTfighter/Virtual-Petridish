@@ -1,0 +1,32 @@
+﻿  CellularPotts.cpp
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(70,46): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(137,28): warning C4101: 'err': unreferenced local variable
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(155,28): warning C4101: 'err': unreferenced local variable
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(212,42): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(214,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(407,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(482,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(515,56): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include\utility(193,48): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty1=int
+          ]
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(45): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(45): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include\utility(193,48): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty2=int
+          ]
+  CPM.vcxproj -> C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\x64\Debug\CPM.exe
