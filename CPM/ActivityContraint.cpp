@@ -17,12 +17,12 @@ float ActivityContraint::deltaH(int sourceI, int targetI, int source_type, int t
 
 	if(source_type != 0)
 	{
-		maxAct = this->model->parameters->MAX_ACT[source_type];
-		lambdaAct = this->model->parameters->LAMBDA_ACT[source_type];
+		maxAct = this->model->parameters->MAX_ACT[this->model->getCellKind(source_type)];
+		lambdaAct = this->model->parameters->LAMBDA_ACT[this->model->getCellKind(source_type)];
 	}else
 	{
-		maxAct = this->model->parameters->MAX_ACT[target_type];
-		lambdaAct = this->model->parameters->LAMBDA_ACT[target_type];
+		maxAct = this->model->parameters->MAX_ACT[this->model->getCellKind(target_type)];
+		lambdaAct = this->model->parameters->LAMBDA_ACT[this->model->getCellKind(target_type)];
 	}
 
 	if(maxAct == 0 || lambdaAct == 0)
@@ -43,7 +43,7 @@ void ActivityContraint::afterSetModelMethod()
 
 void ActivityContraint::postSetpixListener(int i, int t_old, int t_new)
 {
-	this->cellpixelsact[i] = this->model->parameters->MAX_ACT[t_new];
+	this->cellpixelsact[i] = this->model->parameters->MAX_ACT[this->model->getCellKind(t_new)];
 }
 
 void ActivityContraint::postMCSListener()

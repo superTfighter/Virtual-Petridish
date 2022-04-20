@@ -4,6 +4,7 @@
 #include <chrono>
 #include <thread>
 
+
 CellularPotts::CellularPotts() : grid(0, 0)
 {
 	Parameters p;
@@ -122,6 +123,10 @@ void CellularPotts::monteCarloParallel()
 
 		if (canExecute)
 			monteCarloStep();
+
+		Statistics statistics = Statistics(this);
+
+		statistics.Centoids();
 
 		executing = false;
 	}

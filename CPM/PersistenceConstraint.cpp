@@ -33,5 +33,22 @@ void PersistenceConstraint::afterSetModelMethod()
 void PersistenceConstraint::postMCSListener()
 {
 
+	Statistics statistics = Statistics(this->model);
+
+	std::vector<std::pair<float,float>> centroids = statistics.Centoids();
+
+	for (size_t i = 1; i < centroids.size(); i++)
+	{
+		int cellID = i;
+
+		auto ld = this->model->parameters->LAMDA_DIR[this->model->getCellKind(cellID)];
+		auto dt = 10; //TODO: CHECK IF ITS GOOD?
+
+		if(cellcentroidlists.size() > cellID && ) 
+
+
+
+	}
+
 
 }

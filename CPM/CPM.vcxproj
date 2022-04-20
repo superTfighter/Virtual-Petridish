@@ -173,6 +173,7 @@
     <ClCompile Include="PersistenceConstraint.cpp" />
     <ClCompile Include="PixelsByCell.cpp" />
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="Statistics.cpp" />
     <ClCompile Include="VolumeConstraint.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +201,7 @@
     <ClInclude Include="PersistenceConstraint.h" />
     <ClInclude Include="PixelsByCell.h" />
     <ClInclude Include="Simulation.h" />
+    <ClInclude Include="Statistics.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="VolumeConstraint.h" />
   </ItemGroup>

@@ -1,32 +1,150 @@
-﻿  CellularPotts.cpp
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(70,46): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(137,28): warning C4101: 'err': unreferenced local variable
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(155,28): warning C4101: 'err': unreferenced local variable
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(212,42): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(214,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(407,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(482,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(515,56): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include\utility(193,48): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
+﻿  ActivityContraint.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\ActivityContraint.cpp(46,65): warning C4244: '=': conversion from '_Ty' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=float
+          ]
+          and
+          [
+              _Ty=int
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\ActivityContraint.cpp(102,11): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\ActivityContraint.cpp(132,17): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\ActivityContraint.cpp(141,34): warning C4101: 'oor': unreferenced local variable
+  AdhesionConstraint.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\AdhesionConstraint.cpp(25,37): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\AdhesionConstraint.cpp(29,12): warning C4244: 'return': conversion from 'int' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\AdhesionConstraint.cpp(40,42): warning C4244: 'return': conversion from '_Ty' to 'float', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+  Cell.cpp
+  CellularPotts.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(71,46): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(127,3): error C2065: 'Statistics': undeclared identifier
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(127,14): error C2146: syntax error: missing ';' before identifier 'statistics'
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(127,14): error C2065: 'statistics': undeclared identifier
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(127,27): error C3861: 'Statistics': identifier not found
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(129,3): error C2065: 'statistics': undeclared identifier
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(217,42): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(219,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(412,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(487,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(520,56): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Centroids.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Centroids.cpp(21,34): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Centroids.cpp(71,13): warning C4244: '=': conversion from 'float' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+  Display.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(53,48): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(53,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(90,64): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(90,40): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(95,80): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(95,65): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(101,64): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(101,40): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(102,39): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  GridManadger.cpp
+  HamiltonianConstraint.cpp
+  Parameters.cpp
+  PerimeterConstraint.cpp
+  PersistenceConstraint.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\PersistenceConstraint.cpp(42,17): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\PersistenceConstraint.cpp(47,43): error C2059: syntax error: ')'
+  PixelsByCell.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\PixelsByCell.cpp(33,37): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
           with
           [
               _Ty1=int
           ]
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(45): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\PixelsByCell.cpp(27): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
           with
           [
               _Other1=size_t &,
               _Other2=size_t &
           ]
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\CellularPotts.cpp(45): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\PixelsByCell.cpp(27): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
           with
           [
               _Other1=size_t &,
               _Other2=size_t &
           ]
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29910\include\utility(193,48): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
           with
           [
               _Ty2=int
           ]
-  CPM.vcxproj -> C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\x64\Debug\CPM.exe
+  Simulation.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(53,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(65,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(92,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(118,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(138,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(155,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty1=int
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(80): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(80): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty2=int
+          ]
+  Statistics.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Statistics.cpp(10,19): warning C4834: discarding return value of function with 'nodiscard' attribute
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Statistics.cpp(17,62): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Statistics.cpp(51,18): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,16): warning C4244: 'initializing': conversion from '_Ty' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty1=float
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Statistics.cpp(55): message : see reference to function template instantiation 'std::pair<float,float>::pair<int,int,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=int,
+              _Other2=int
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\Statistics.cpp(55): message : see reference to function template instantiation 'std::pair<float,float>::pair<int,int,0>(_Other1 &&,_Other2 &&) noexcept' being compiled
+          with
+          [
+              _Other1=int,
+              _Other2=int
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4244: 'initializing': conversion from '_Ty' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty=int
+          ]
+          and
+          [
+              _Ty2=float
+          ]
+  VolumeConstraint.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\VolumeConstraint.cpp(20,18): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+  main.cpp
+  Generating Code...
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\ActivityContraint.cpp(73): warning C4715: 'ActivityContraint::activityAt': not all control paths return a value

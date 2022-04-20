@@ -3,8 +3,8 @@
 Simulation::Simulation(std::vector<std::thread>* threadPool)
 {
 	this->threadPool = threadPool;
-
 	simulationRunning = false;
+
 }
 
 bool Simulation::runSimulation()
@@ -166,7 +166,6 @@ void Simulation::setupSimulation(int number)
 		model.addConstraint(&activity);
 
 	}
-
 }
 
 unsigned char* Simulation::getImageData()

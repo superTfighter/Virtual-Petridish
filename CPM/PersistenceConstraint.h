@@ -1,5 +1,6 @@
 #pragma once
 #include "HamiltonianConstraint.h"
+#include "Statistics.h"
 
 class PersistenceConstraint : public HamiltonianConstraint
 {
@@ -15,7 +16,7 @@ private:
 
 	std::vector<int> halfsize;
 
-	std::map<int, int> cellcentroidlists;
+	std::vector<std::pair<float, float>> cellcentroidlists;
 	std::map<int, std::pair<int,int>> celldirections;
 
 
