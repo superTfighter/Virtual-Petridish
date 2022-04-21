@@ -21,7 +21,14 @@ public:
 	std::pair<int, int> middle;
 
 	std::vector<int> _pixelArray;
+	
 	int x_step;
+	int x_bits;
+	int y_bits;
+	int y_mask;
+
+
+	std::vector<int> actuallyRenderPixelArray;
 
 	//Return -1 for neighbours outside of border
 	std::vector<int> neighi(int index);
@@ -31,11 +38,6 @@ public:
 
 
 private:
-	int x_bits;
-	int y_bits;
-	int y_mask;
-	
-
 	int laplaciani(int index);
 
 	//Von Neumann neighborhood -- only 4 top,bottom,left,right

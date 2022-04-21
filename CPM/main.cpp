@@ -7,7 +7,6 @@
 #include <d3d11.h>
 #include <tchar.h>
 
-
 #include <iostream>
 #include <cstdint> // for specific size integers
 #include <fstream> // for file handling

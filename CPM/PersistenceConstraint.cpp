@@ -44,7 +44,10 @@ void PersistenceConstraint::postMCSListener()
 		auto ld = this->model->parameters->LAMDA_DIR[this->model->getCellKind(cellID)];
 		auto dt = 10; //TODO: CHECK IF ITS GOOD?
 
-		if(cellcentroidlists.size() > cellID && ) 
+		if(cellcentroidlists.size() > cellID)
+		{
+
+		}
 
 
 

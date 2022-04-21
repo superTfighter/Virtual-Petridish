@@ -17,6 +17,8 @@ Grid::Grid(int xSize, int ySize)
 	this->middle = std::pair<int,int>(xSize / 2, ySize / 2);
 
 	neighbours.resize(8);
+
+	actuallyRenderPixelArray.resize(size.first*size.second);
 }
 
 int Grid::pointToIndex(std::pair<int, int> point)
@@ -114,7 +116,7 @@ std::vector<int> Grid::neighi(int index)
 
 int Grid::pixti(int src_i)
 {
-	if (src_i == -1)
+	if (src_i < 0)
 		return -1;
 	
 	return this->_pixelArray[src_i];

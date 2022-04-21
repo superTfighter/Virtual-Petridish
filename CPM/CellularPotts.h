@@ -4,10 +4,15 @@
 #include "HamiltonianConstraint.h"
 #include "DiceSet.h"
 #include "Cell.h"
+#include <chrono>
+#include <thread>
+
+
 
 
 class HamiltonianConstraint;
 class Cell;
+
 
 class CellularPotts
 {
@@ -74,5 +79,10 @@ private:
 	std::vector<int> _neighbours;
 
 	std::vector<HamiltonianConstraint*> contraints;
+
+	bool makingANewCellID;
+	bool settingAPixel;
+
+	char* previousImage;
 };
 

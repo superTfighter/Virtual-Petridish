@@ -1,8 +1,6 @@
 #include "CellularPotts.h"
 #include "PixelsByCell.h"
 
-#include <chrono>
-#include <thread>
 
 
 CellularPotts::CellularPotts() : grid(0, 0)
@@ -19,6 +17,11 @@ CellularPotts::CellularPotts(std::pair<int, int> gridSize, Parameters* parameter
 
 void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 {
+	previousImage = nullptr;
+	makingANewCellID = false;
+	settingAPixel = false;
+
+
 	this->grid = Grid(gridSize.first, gridSize.second);
 	this->parameters = parameters;
 
@@ -35,8 +38,6 @@ void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 	_neighbours.resize(gridSize.first * gridSize.second * 8);
 
 	this->simTime = 0;
-
-
 
 
 	for (size_t i = 0; i < grid.size.first; i++)
@@ -124,31 +125,46 @@ void CellularPotts::monteCarloParallel()
 		if (canExecute)
 			monteCarloStep();
 
-		Statistics statistics = Statistics(this);
-
-		statistics.Centoids();
-
 		executing = false;
 	}
 }
-
+//TODO:MAKE IT THREADSAFE
 int CellularPotts::makeNewCellID(int kind)
 {
-	int newID = ++this->last_cell_id;
 
-	try {
-		cellVolume.insert(cellVolume.begin() + newID, kind);
+	if (!makingANewCellID) {
+
+		makingANewCellID = true;
+
+		int newID = ++this->last_cell_id;
+
+		try {
+			cellVolume.insert(cellVolume.begin() + newID, kind);
+		}
+		catch (std::out_of_range& err) {
+
+			cellVolume.resize(cellVolume.size() * 2);
+			cellVolume.insert(cellVolume.begin() + newID, kind);
+		}
+
+		this->setCellKind(newID, kind);
+		cells.push_back(Cell(this, kind, newID));
+
+		makingANewCellID = false;
+
+		return newID;
+	}else
+	{
+
+		while (makingANewCellID)
+		{
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+
+		return makeNewCellID(kind);
 	}
-	catch (std::out_of_range& err) {
 
-		cellVolume.resize(cellVolume.size() * 2);
-		cellVolume.insert(cellVolume.begin() + newID, kind);
-	}
-
-	this->setCellKind(newID, kind);
-	cells.push_back(Cell(this, kind, newID));
-
-	return newID;
+	
 }
 
 void CellularPotts::setCellKind(int typeID, int kind)
@@ -246,6 +262,7 @@ bool CellularPotts::docopy(float deltaH)
 	return (int)random < (float)std::exp(-deltaH / this->parameters->T);
 }
 
+//deprecated
 void CellularPotts::parallelImageCalc(unsigned char* image, int startIndex, int endIndex, int i)
 {
 	unsigned bytePerPixel = 4;
@@ -330,7 +347,23 @@ void CellularPotts::setPixelI(int cellId, int sourceType)
 
 void CellularPotts::setPixel(std::pair<int, int> point, int sourceType)
 {
-	this->setPixelI(this->grid.pointToIndex(point), sourceType);
+
+	if (!settingAPixel)
+	{
+		settingAPixel = true;
+	
+		this->setPixelI(this->grid.pointToIndex(point), sourceType);
+		
+		settingAPixel = false;
+	}
+	else
+	{
+		while (settingAPixel)
+		{
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+	
+	}
 }
 
 int CellularPotts::getCellVolume(int cellId)
@@ -398,6 +431,7 @@ void CellularPotts::addPostMCstepFunction(void(*function)())
 	postMCstepFunctions.push_back(function);
 }
 
+//deprecated
 unsigned char* CellularPotts::getRenderImage()
 {
 	if (!executing)
@@ -406,7 +440,9 @@ unsigned char* CellularPotts::getRenderImage()
 		unsigned bytePerPixel = 4;
 		unsigned char* image = new unsigned char[this->grid.size.first * this->grid.size.second * bytePerPixel];
 
-		std::vector<std::thread> calc_thread = std::vector<std::thread>(16);
+		//previousImage = _strdup(image);
+
+		std::vector<std::thread> calc_thread = std::vector<std::thread>(4);
 
 		int init_i = 0;
 		int block_size = this->grid.size.first / calc_thread.size();
@@ -439,7 +475,7 @@ unsigned char* CellularPotts::getRenderImage()
 
 			if (borders[i].first != -1 && borders[i].second != -1) {
 
-				unsigned char* pixelOffset = image + (borders[i].second + this->grid.size.second * borders[i].first) * bytePerPixel;
+				unsigned char* pixelOffset = (unsigned char*)image + (borders[i].second + this->grid.size.second * borders[i].first) * bytePerPixel;
 
 
 				pixelOffset[0] = r;
@@ -449,9 +485,6 @@ unsigned char* CellularPotts::getRenderImage()
 
 			}
 		}
-
-
-
 
 		canExecute = true;
 
@@ -471,7 +504,7 @@ unsigned char* CellularPotts::getRenderImage()
 	}
 }
 
-
+//deprecated
 unsigned char* CellularPotts::getRenderImage(std::vector<int>& activityVector)
 {
 	if (!executing)
@@ -481,7 +514,7 @@ unsigned char* CellularPotts::getRenderImage(std::vector<int>& activityVector)
 		unsigned char* image = new unsigned char[this->grid.size.first * this->grid.size.second * bytePerPixel];
 
 
-		std::vector<std::thread> calc_thread = std::vector<std::thread>(16);
+		std::vector<std::thread> calc_thread = std::vector<std::thread>(4);
 
 		int init_i = 0;
 		int block_size = this->grid.size.first / calc_thread.size();

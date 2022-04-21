@@ -9,6 +9,7 @@
 #include "PixelsByCell.h"
 #include "Centroids.h"
 #include <thread>
+#include "OpenCL.h"
 
 
 class Simulation
@@ -42,6 +43,10 @@ public:
 	void testFunction();
 
 private:
+
+	OpenCL cl;
+
+	void setupSimulationParallel(CellularPotts* model, bool sameCell, int startIndex, int endIndex, int i, int cellID = -1, int spaceing = 1);
 
 
 
