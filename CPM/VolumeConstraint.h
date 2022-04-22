@@ -9,6 +9,5 @@ public:
 
 private:
 	float volumeConstraint(float vgain, int cellId);
-
 };
 

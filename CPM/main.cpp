@@ -20,8 +20,6 @@ constexpr int FLOAT_MAX = 1;
 
 //TODO:Finish persitence contraint
 
-//TODO: Parallel execution
-
 // Data
 static ID3D11Device* g_pd3dDevice = NULL;
 static ID3D11DeviceContext* g_pd3dDeviceContext = NULL;

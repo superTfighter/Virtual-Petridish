@@ -92,70 +92,32 @@ void Simulation::setupSimulation(int number)
 			}
 		}
 
-		/*
-
-		//START THREADS
-		for (size_t i = 0; i < calc_thread.size(); i++)
-		{
-
-			calc_thread[i] = std::thread(&Simulation::setupSimulationParallel, this, &model, true, init_i,init_i+block_size,0, cellId,-1);
-
-			init_i = init_i + block_size;
-		}
-
-		//WAIT FOR THREADS TO FINISH
-		for (size_t i = 0; i < calc_thread.size(); i++)
-		{
-			if (calc_thread[i].joinable())
-				calc_thread[i].join();
-			else
-			{
-				i = i - 1;
-				std::this_thread::sleep_for(std::chrono::microseconds(1));
-			}
-		}
-
-		*/
-
-
-
 		model.addConstraint(&adhesion);
 
 	}
 	else if (number == 2) { //EPHILIA
 
 		srand(time(NULL));
-		p = Parameters(1, { {0,0},{0,-2} }, 50.0f, { 0,70 }, { 0,100 }, { 0,3 }, { 0,0 });
+		p = Parameters(1, { {0,0},{0,-2} }, 50.0f, { 0,700 }, { 0,15000 }, { 0,3 }, { 0,0 });
 
-		model = CellularPotts(std::pair<int, int>(1000, 300), &p);
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
 
 		int init_i = 0;
 		int block_size = this->model.grid.size.first / calc_thread.size();
 
-		//START THREADS
-		for (size_t i = 0; i < calc_thread.size(); i++)
+
+		for (size_t x = 0; x < model.grid.size.first; x += 10)
 		{
-
-			calc_thread[i] = std::thread(&Simulation::setupSimulationParallel, this,&model, false, init_i, init_i + block_size, 0,-1,50);
-
-			init_i = init_i + block_size;
-		}
-
-		//WAIT FOR THREADS TO FINISH
-		for (size_t i = 0; i < calc_thread.size(); i++)
-		{
-			if (calc_thread[i].joinable())
-				calc_thread[i].join();
-			else
+			for (size_t j = 0; j < model.grid.size.second; j += 10)
 			{
-				i = i - 1;
-				std::this_thread::sleep_for(std::chrono::microseconds(1));
+				model.setPixel(std::pair<int, int>(x, j), model.makeNewCellID(1));
 			}
+
 		}
+
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
-		model.addConstraint(&peremiter);
 
 
 	}
@@ -167,7 +129,7 @@ void Simulation::setupSimulation(int number)
 
 		srand(time(NULL));
 
-		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,20 }, { 0,2000 }, { 0,0 }, { 0,0 });
+		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,200 }, { 0,2000 }, { 0,0 }, { 0,0 });
 		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
 
 
@@ -187,15 +149,24 @@ void Simulation::setupSimulation(int number)
 
 		srand(time(NULL));
 
-		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,2 }, { 0,100 }, { 0,0 }, { 0,0 });
-		model = CellularPotts(std::pair<int, int>(100, 100), &p);
+		p = Parameters(1, { {0,20},{20,-100} }, 20.0f, { 0,200 }, { 0,10000 }, { 0,0 }, { 0,0 });
+		model = CellularPotts(std::pair<int, int>(250, 250), &p);
 
-		model.setPixel(std::pair<int, int>(10, 25), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(10, 25), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(20, 25), model.makeNewCellID(1));
+		for (size_t i = 0; i < model.grid.size.first; i+=10)
+		{
+
+			model.setPixel(std::pair<int, int>(i, 125), model.makeNewCellID(1));
+
+		}
+
+	
+
+
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
+		model.addConstraint(&peremiter);
+
 	}
 	else if (number == 6) {
 
@@ -246,39 +217,4 @@ void Simulation::testFunction()
 	std::cout << " DONE" << std::endl;
 }
 
-void Simulation::setupSimulationParallel(CellularPotts* model,bool sameCell, int startIndex, int endIndex, int i, int cellID, int spaceing)
-{
-	
-	if(sameCell)
-	{
-
-		for (size_t x = startIndex; x < endIndex; x++)
-		{
-			for (size_t j = 0; j < model->grid.size.second; j++)
-			{
-				float randomNumber = 0.0f + (float)(rand()) / ((float)(RAND_MAX / (1.0f - 0.0f)));
-
-				if (randomNumber < 0.49) {
-					model->setPixel(std::pair<int, int>(x, j), cellID);
-				}
-			}
-		}
-	}
-	else
-	{
-
-		for (size_t x = startIndex; x < endIndex; x+= spaceing)
-		{
-			for (size_t j = 5; j < model->grid.size.second; j += spaceing)
-			{
-				model->setPixel(std::pair<int, int>(x, j), model->makeNewCellID(1));
-			}
-
-		}
-
-	}
-
-
-
-}
 

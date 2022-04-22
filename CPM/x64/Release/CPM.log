@@ -1,4 +1,35 @@
-﻿  Display.cpp
+﻿  CellularPotts.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(72,46): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(144,29): warning C4101: 'err': unreferenced local variable
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(176,28): warning C4101: 'err': unreferenced local variable
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(233,42): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(235,12): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(448,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(520,62): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(553,56): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
+          with
+          [
+              _Ty1=int
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(47): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\CellularPotts.cpp(47): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
+          with
+          [
+              _Other1=size_t &,
+              _Other2=size_t &
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
+          with
+          [
+              _Ty2=int
+          ]
+  Display.cpp
 Z:\Egyetem\Projects\Virtual-Petridish\CPM\OpenCL.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(53,48): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
 Z:\Egyetem\Projects\Virtual-Petridish\CPM\Display.cpp(53,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
@@ -44,11 +75,13 @@ C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.2
           [
               _Ty2=int
           ]
+  VolumeConstraint.cpp
+Z:\Egyetem\Projects\Virtual-Petridish\CPM\VolumeConstraint.cpp(20,18): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   main.cpp
 Z:\Egyetem\Projects\Virtual-Petridish\CPM\OpenCL.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
   Generating code
-  13 of 2855 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    40 functions had inline decision re-evaluated but remain unchanged
+  0 of 2855 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   CPM.vcxproj -> Z:\Egyetem\Projects\Virtual-Petridish\x64\Release\CPM.exe

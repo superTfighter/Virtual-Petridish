@@ -20,6 +20,7 @@ void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 	previousImage = nullptr;
 	makingANewCellID = false;
 	settingAPixel = false;
+	executing = false;
 
 
 	this->grid = Grid(gridSize.first, gridSize.second);
@@ -128,7 +129,7 @@ void CellularPotts::monteCarloParallel()
 		executing = false;
 	}
 }
-//TODO:MAKE IT THREADSAFE
+
 int CellularPotts::makeNewCellID(int kind)
 {
 

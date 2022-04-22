@@ -25,7 +25,7 @@ int Display::render()
 
 	if (!showExampleChooser) {
 		showProject(1);
-		showParameters();
+		//showParameters();
 
 	}
 
@@ -94,6 +94,9 @@ void Display::showProject(int projectNumber)
 	ImGui::Begin("Simulation", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2))));
 	ImGui::End();
+
+	 my_texture = NULL;
+	 delete my_texture;
 }
 
 void Display::showParameters()
@@ -209,8 +212,8 @@ bool Display::LoadTexture(ID3D11ShaderResourceView** out_srv, int* out_width, in
 	*out_width = image_width;
 	*out_height = image_height;
 
-	image_data = nullptr;
-	delete image_data;
+	delete [] image_data;
+
 
 	return true;
 }

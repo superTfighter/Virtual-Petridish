@@ -36,13 +36,16 @@ __kernel void border(__global char* image,__global int* border,__global int* pix
 	{
 		int x = (index >> y_bits);
 		int y = (index & y_mask);
-
-		int offset = (y + y * x) * 4;
-
+		
+		int offset = (y + sizeY * x) * 4;
+		
 		image[offset] = 0;
 		image[offset + 1] = 0;
 		image[offset + 2] = 0;
 		image[offset + 3] = 255;
+
+
+
 	}
 	
 }

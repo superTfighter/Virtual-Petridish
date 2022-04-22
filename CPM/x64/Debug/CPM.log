@@ -1,33 +1,5 @@
-﻿  Simulation.cpp
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\OpenCL.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(59,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(71,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(78,68): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(127,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(133,68): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(168,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(188,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(205,13): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty1', possible loss of data
-          with
-          [
-              _Ty1=int
-          ]
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(90): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
-          with
-          [
-              _Other1=size_t &,
-              _Other2=size_t &
-          ]
-Z:\Egyetem\Projects\Virtual-Petridish\CPM\Simulation.cpp(90): message : see reference to function template instantiation 'std::pair<int,int>::pair<size_t&,size_t&,0>(_Other1,_Other2) noexcept' being compiled
-          with
-          [
-              _Other1=size_t &,
-              _Other2=size_t &
-          ]
-C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.28.29333\include\utility(190,1): warning C4267: 'initializing': conversion from 'size_t' to '_Ty2', possible loss of data
-          with
-          [
-              _Ty2=int
-          ]
-  CPM.vcxproj -> Z:\Egyetem\Projects\Virtual-Petridish\x64\Debug\CPM.exe
+﻿  DiceSet.cpp
+z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(11): error C3861: 'time': identifier not found
+z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(56): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(56): warning C4267: 'initializing': conversion from 'size_t' to 'const int', possible loss of data
+z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(65): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
