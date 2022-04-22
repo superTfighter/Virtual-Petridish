@@ -124,6 +124,21 @@ void Simulation::setupSimulation(int number)
 	else if (number == 3) {
 
 		//TODO:CellSorting
+
+		srand(time(NULL));
+		p = Parameters(2, { {0,12,6},{12,6,16},{6,16,6} }, 15.0f, { 0,2,2 }, { 0,25,25 }, { 0,0 }, { 0,0 });
+
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		int n = 500;
+		int max_attempts = 10 * n;
+
+		model.setPixel(std::pair<int, int>(50, 50), model.makeNewCellID(1));	
+		model.setPixel(std::pair<int, int>(25, 25), model.makeNewCellID(2));
+		
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
 	}
 	else if (number == 4) {
 

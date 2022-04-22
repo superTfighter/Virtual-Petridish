@@ -1,5 +1,1 @@
-﻿  DiceSet.cpp
-z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(11): error C3861: 'time': identifier not found
-z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(56): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(56): warning C4267: 'initializing': conversion from 'size_t' to 'const int', possible loss of data
-z:\egyetem\projects\virtual-petridish\cpm\diceset.cpp(65): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+﻿  CPM.vcxproj -> Z:\Egyetem\Projects\Virtual-Petridish\x64\Debug\CPM.exe

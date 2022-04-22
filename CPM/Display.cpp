@@ -25,7 +25,7 @@ int Display::render()
 
 	if (!showExampleChooser) {
 		showProject(1);
-		//showParameters();
+		showParameters();
 
 	}
 
@@ -162,10 +162,10 @@ void Display::showParameters()
 		ImGui::TreePop();
 	}
 
-
-
-
 	ImGui::End();
+
+	parameters = nullptr;
+	delete[] parameters;
 
 }
 
