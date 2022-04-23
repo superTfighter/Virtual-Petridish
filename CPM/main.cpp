@@ -136,6 +136,9 @@ int main(int, char**)
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 		g_pSwapChain->Present(1, 0);
+
+		if(display.my_texture != nullptr)
+			display.my_texture->Release(); //FREE UP TEXTURE AFTER RENDER
 	}
 
 	// Cleanup

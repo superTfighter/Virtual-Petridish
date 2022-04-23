@@ -32,12 +32,10 @@ int Display::render()
 
 	if (showExampleChooser)
 		ExampleChooser();
-	
 
 
 	// Rendering
 	ImGui::Render();
-
 
 	return 0;
 }
@@ -83,7 +81,7 @@ void Display::showProject(int projectNumber)
 {
 	int my_image_width = 0;
 	int my_image_height = 0;
-	ID3D11ShaderResourceView* my_texture = NULL;
+	my_texture = NULL;
 	bool ret = LoadTexture(&my_texture, &my_image_width, &my_image_height);
 	IM_ASSERT(ret);
 
@@ -95,8 +93,9 @@ void Display::showProject(int projectNumber)
 	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2))));
 	ImGui::End();
 
-	 my_texture = NULL;
-	 delete my_texture;
+
+	 //my_texture = NULL;
+	 //delete my_texture;
 }
 
 void Display::showParameters()

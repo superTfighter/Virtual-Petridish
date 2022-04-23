@@ -28,6 +28,7 @@ public:
 
 	ID3D11Device* g_pd3dDevice;
 	Simulation* simulation;
+	ID3D11ShaderResourceView* my_texture;
 
 private:
 	bool showExampleChooser;
@@ -39,5 +40,6 @@ private:
 	int height;
 
 	bool LoadTexture(ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height);
+
 };
 
