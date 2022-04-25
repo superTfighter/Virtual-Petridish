@@ -1,39 +1,38 @@
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\vc142.pdb
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\vc142.idb
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\opencl.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\main.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_widgets.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_tables.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_impl_win32.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_impl_dx11.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_draw.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui_demo.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\imgui.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\hamiltonianconstraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\gridmanadger.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\grid.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\displayhelper.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\display.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\diceset.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\centroids.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cellularpotts.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cell.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\adhesionconstraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\activitycontraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\volumeconstraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\statistics.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\simulation.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\pixelsbycell.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\persistenceconstraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\perimeterconstraint.obj
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\parameters.obj
-z:\egyetem\projects\virtual-petridish\x64\debug\cpm.exe
-z:\egyetem\projects\virtual-petridish\x64\debug\cpm.ilk
-z:\egyetem\projects\virtual-petridish\x64\debug\cpm.pdb
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\display.obj.enc
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\cl.command.1.tlog
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\cl.read.1.tlog
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\cl.write.1.tlog
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\link.command.1.tlog
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\link.read.1.tlog
-z:\egyetem\projects\virtual-petridish\cpm\x64\debug\cpm.tlog\link.write.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\vc142.pdb
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\vc142.idb
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\opencl.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\main.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_widgets.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_tables.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_impl_win32.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_impl_dx11.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_draw.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui_demo.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\imgui.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\hamiltonianconstraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\gridmanadger.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\grid.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\displayhelper.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\display.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\diceset.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\centroids.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cellularpotts.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cell.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\adhesionconstraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\activitycontraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\volumeconstraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\statistics.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\simulation.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\pixelsbycell.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\persistenceconstraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\perimeterconstraint.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\parameters.obj
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\x64\debug\cpm.ilk
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\x64\debug\cpm.exe
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\x64\debug\cpm.pdb
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\cl.command.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\cl.read.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\cl.write.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\link.command.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\link.read.1.tlog
+c:\users\lex tomi\documents\egyetem\virtual-petridish-master\cpm\x64\debug\cpm.tlog\link.write.1.tlog
