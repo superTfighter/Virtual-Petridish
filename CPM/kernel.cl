@@ -24,6 +24,16 @@ __kernel void calculate(__global char* image,__global int* pixels, int sizeX, in
 		image[offset + 3] = 255;
 	}
 
+	if(x == 0 || x == sizeX || y == 0 || y == sizeY)
+	{
+
+		image[offset] = 0;
+		image[offset + 1] = 0;
+		image[offset + 2] = 0;
+		image[offset + 3] = 255;
+
+	}
+
 		
 }
 

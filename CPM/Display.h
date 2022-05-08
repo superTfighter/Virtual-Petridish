@@ -35,6 +35,7 @@ private:
 	void ExampleChooser();
 	void showProject(int projectNumber);
 	void showParameters();
+	void showStatistics();
 
 	int width;
 	int height;

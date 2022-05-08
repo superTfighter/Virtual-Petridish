@@ -13,13 +13,23 @@ DiceSet::DiceSet()
 
 bool DiceSet::contains(int uniqueID)
 {
-	for (std::pair<int, int> element : indices)
+	if(indices.count(uniqueID))
 	{
-		if (uniqueID == element.first)
-			return true;
+		return true;
 	}
 
 	return false;
+
+
+
+
+	//for (std::pair<int, int> element : indices)
+	//{
+	//	if (uniqueID == element.first)
+	//		return true;
+	//}
+
+	//return false;
 }
 
 void DiceSet::insert(int uniqueID)

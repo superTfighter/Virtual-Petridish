@@ -72,7 +72,7 @@ void Simulation::setupSimulation(int number)
 
 		p = Parameters(3, { {0,20},{20,100} }, 20.0f, { 0,5 }, { 0,10 }, { 0,0 }, { 0,0 });
 
-		model = CellularPotts(std::pair<int, int>(100, 100), &p);
+		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
 
 		int init_i = 0;
 		int block_size = this->model.grid.size.first / calc_thread.size();
@@ -115,10 +115,8 @@ void Simulation::setupSimulation(int number)
 
 		}
 
-
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
-
 
 	}
 	else if (number == 3) {
@@ -164,42 +162,35 @@ void Simulation::setupSimulation(int number)
 
 		srand(time(NULL));
 
-		p = Parameters(1, { {0,20},{20,-100} }, 20.0f, { 0,200 }, { 0,10000 }, { 0,0 }, { 0,0 });
-		model = CellularPotts(std::pair<int, int>(250, 250), &p);
+		p = Parameters(1, { {0,100},{100,-100} }, 20.0f, { 0,150 }, { 0,625 }, { 0,0 }, { 0,0 });
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
 
-		for (size_t i = 0; i < model.grid.size.first; i+=10)
+		for (size_t i = 0; i < 500; i+=50)
 		{
-
-			model.setPixel(std::pair<int, int>(i, 125), model.makeNewCellID(1));
-
+			model.setPixel(std::pair<int, int>(i, 10), model.makeNewCellID(1));
+			model.setPixel(std::pair<int, int>(i, 490), model.makeNewCellID(1));
 		}
 
 	
-
-
-
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
-		model.addConstraint(&peremiter);
+
+		model.cellDivision = true;
 
 	}
 	else if (number == 6) {
 
-		//TODO:DIVISION
-
-		//TODO: REMOVE ACT MODEL
 		srand(time(NULL));
 
-
-		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,50 }, { 0,500 }, { 0,2 }, { 0,260 },"arithmetic", { 0,300 }, { 0,300 });
-
-		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
+		p = Parameters(1, { {0,20},{20,1000} }, 20.0f, { 0,15 }, { 0,500 }, { 0,0 }, { 0,0 });
+		model = CellularPotts(std::pair<int, int>(2500, 2500), &p);
 
 		model.setPixel(std::pair<int, int>(model.grid.size.first / 2, model.grid.size.second / 2), model.makeNewCellID(1));
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
-		model.addConstraint(&activity);
+
+		model.cellDivision = true;
 
 	}
 

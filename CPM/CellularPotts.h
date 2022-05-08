@@ -6,6 +6,8 @@
 #include "Cell.h"
 #include <chrono>
 #include <thread>
+#include "GridManadger.h"
+#include <random>
 
 
 
@@ -50,20 +52,24 @@ public:
 	Grid grid;
 	Parameters *parameters;
 	DiceSet borderpixels;
-	float simTime;
+	int simTime;
 
 	void birth(int childID,int parentID);
 
 	bool executing;
 	bool canExecute;
+	bool cellDivision;
 
 	std::vector<void (*)()> postMCstepFunctions;
 
 	void addPostMCstepFunction(void (*function)());
 
 	unsigned char* getRenderImage();
-
 	unsigned char* getRenderImage(std::vector<int>& activityVector);
+
+	int getCellCount();
+	int getCellTypeCount();
+	float getAreaCoveredByCells();
 
 private:
 	int number_of_cells;

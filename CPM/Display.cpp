@@ -26,6 +26,7 @@ int Display::render()
 	if (!showExampleChooser) {
 		showProject(1);
 		showParameters();
+		showStatistics();
 
 	}
 
@@ -59,7 +60,7 @@ void Display::ExampleChooser()
 
 	ImGui::Separator();
 
-	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Multiple cells - small space", "Cell Division" };
+	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Wound healing", "Cell Division" };
 	static int item_current = -1;
 	ImGui::ListBox("Choose your simulation!", &item_current, items, IM_ARRAYSIZE(items), 4);
 
@@ -90,7 +91,9 @@ void Display::showProject(int projectNumber)
 	bool open = true;
 
 	ImGui::Begin("Simulation", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
-	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2))));
+	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
+
+	//ImGui::Image((void*)my_texture, ImVec2(my_image_width, my_image_height));
 	ImGui::End();
 
 
@@ -165,6 +168,63 @@ void Display::showParameters()
 
 	parameters = nullptr;
 	delete[] parameters;
+
+}
+
+void Display::showStatistics()
+{
+	ImGui::SetNextWindowSize(ImVec2(width, height - (height * 0.8)));
+	ImGui::SetNextWindowPos(ImVec2(0, height - (height * 0.2)));
+
+	bool open = true;
+	ImGui::Begin("Statistics", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+	static ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
+
+	if (ImGui::BeginTable("table1", 3, flags))
+	{
+
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Number of cells: %d", this->simulation->model.getCellCount());
+
+		ImGui::TableSetColumnIndex(1);
+
+		ImGui::TableSetColumnIndex(2);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Simulation time: %d", this->simulation->model.simTime);
+
+		ImGui::TableSetColumnIndex(1);
+
+		ImGui::TableSetColumnIndex(2);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("AreaCovered by cells: %d / %f : %f percent", this->simulation->model.grid.size.first * this->simulation->model.grid.size.second, this->simulation->model.getAreaCoveredByCells(), this->simulation->model.getAreaCoveredByCells() / (this->simulation->model.grid.size.first * this->simulation->model.grid.size.second));
+
+		ImGui::TableSetColumnIndex(1);
+
+		ImGui::TableSetColumnIndex(2);
+
+
+
+		/*for (int row = 0; row < 5; row++)
+		{
+			
+			for (int column = 0; column < 3; column++)
+			{
+				ImGui::TableSetColumnIndex(column);
+				ImGui::Text("Hello %d,%d", column, row);
+			}
+		}*/
+		ImGui::EndTable();
+	}
+	
+	ImGui::End();
+
 
 }
 

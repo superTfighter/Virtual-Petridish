@@ -21,6 +21,7 @@ void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 	makingANewCellID = false;
 	settingAPixel = false;
 	executing = false;
+	cellDivision = false;
 
 
 	this->grid = Grid(gridSize.first, gridSize.second);
@@ -111,6 +112,38 @@ void CellularPotts::monteCarloStep()
 	{
 		postMCstepFunctions[i]();
 	}
+
+	//TODO:MAKE IT THREADSAFE
+	if(cellDivision)
+	{
+		GridManadger manadger = GridManadger(this);
+
+		std::mt19937 generator = std::mt19937(time(NULL));
+		std::uniform_real_distribution<double> dis(0, 1);
+
+		for (size_t i = 1; i < this->cellTypeToKind.size(); i++)
+		{
+			int cellID = i;
+
+			int cellVolume = this->getCellVolume(cellID);
+			int cellMaxVolume = this->parameters->V[this->getCellKind(cellID)];
+
+			double random = dis(generator);
+
+			//random = 0;
+
+			if(cellVolume > cellMaxVolume*0.95 && random < 0.1)
+			{
+
+				manadger.divideCell(cellID);
+			}
+
+
+		}
+
+	}
+
+	this->updateCellVolumes();
 
 	this->simTime++;
 }
@@ -227,16 +260,17 @@ void CellularPotts::updateBorderNearAri(int index, int old_type, int new_type)
 
 void CellularPotts::updateCellVolumes()
 {
-	auto cp = PixelsByCell(this).getPixelsByCell();
+	auto cp = Statistics(this).PixelsByCell();
 
-	for (auto cell : cells)
+	for (size_t i = 1; i < this->cellTypeToKind.size(); i++)
 	{
-		int cellvolume = cp[cell.cellID].size();
+		int cellvolume = cp[i].size();
 
-		cell.V = cellvolume;
-
-		this->cellVolume[cell.cellID] = cellvolume;
+		this->cellVolume[i] = cellvolume;
 	}
+
+
+	
 
 
 }
@@ -604,4 +638,25 @@ unsigned char* CellularPotts::getRenderImage(std::vector<int>& activityVector)
 
 		return getRenderImage(activityVector);
 	}
+}
+
+int CellularPotts::getCellCount()
+{
+	return this->cellTypeToKind.size()-1;
+}
+
+int CellularPotts::getCellTypeCount()
+{
+	return 0;
+}
+
+float CellularPotts::getAreaCoveredByCells()
+{
+	float size = 0;
+	for (size_t i = 0; i < this->cellVolume.size(); i++)
+	{
+		size += this->cellVolume[i];
+	}
+
+	return size;
 }

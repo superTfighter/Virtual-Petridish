@@ -19,7 +19,7 @@ std::vector<std::vector<std::pair<int, int>>> Statistics::PixelsByCell()
 
 			//PUSH TO FIRST VECTOR THE TYPE
 
-			if (pixelsByCell.size() < pixels[i])
+			if (pixelsByCell.size() < pixels[i] + 1)
 			{
 				pixelsByCell.resize(pixels[i] + 1);
 			}
@@ -78,7 +78,7 @@ std::vector<std::pair<float, float>> Statistics::Centoids()
 
 			}
 
-			if (centoids.size() < cellID)
+			if (centoids.size() < cellID + 1)
 				centoids.resize(cellID + 1);
 
 			centoids[cellID] = centroid;

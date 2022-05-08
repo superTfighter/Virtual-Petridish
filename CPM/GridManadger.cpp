@@ -1,6 +1,4 @@
 #include "GridManadger.h"
-#include "PixelsByCell.h"
-#include "Centroids.h"
 #include <thread>
 
 GridManadger::GridManadger(CellularPotts* model)
@@ -28,26 +26,29 @@ int GridManadger::seedCell(int kind, int maxAttempts)
 	return -1;
 }
 
-void GridManadger::divideCell(Cell cell)
+void GridManadger::divideCell(int cellID)
 {
-	auto cp = PixelsByCell(this->model).getPixelsByCell()[cell.cellID];
-	auto com = Centroids(this->model).getCentroids()[cell.cellID];
+	Statistics stats = Statistics(this->model);
 
-	double bxx, bxy, byy, cx, cy, x2, y2, side, T, D, x0, y0, x1, y1, L2;
-	bxx = bxy = byy = cx = cy = x2 = y2 = side = T = D = x0 = y0 = x1 = y1 = L2 = 0;
+	auto centroids = stats.Centoids()[cellID];
+	auto pixelsByCell = stats.PixelsByCell()[cellID];
 
-	for (size_t i = 0; i < cp.size(); i++)
+	double bxx = 0, bxy = 0, byy = 0, cx, cy, x2, y2, side, T,D, x0, y0, x1, y1, L2;
+
+	for (size_t j = 0;  j < pixelsByCell.size();  j++)
 	{
-		cx = cp[i].first - com[0];
-		cy = cp[i].second - com[1];
+		cx = pixelsByCell[j].first - centroids.first;
+		cy = pixelsByCell[j].second - centroids.second;
+
 
 		bxx += cx * cx;
 		bxy += cx * cy;
 		byy += cy * cy;
+
 	}
 
-	if (bxy == 0) {
-
+	if(bxy == 0)
+	{
 		x0 = 0;
 		y0 = 0;
 		x1 = 1;
@@ -63,27 +64,22 @@ void GridManadger::divideCell(Cell cell)
 		y0 = 0;
 		x1 = L2 - byy;
 		y1 = bxy;
-
 	}
 
-	int newID = model->makeNewCellID(cell.kindID);
-	model->birth(newID, cell.cellID);
+	auto nid = this->model->makeNewCellID(this->model->getCellKind(cellID));
 
-	for (size_t i = 0; i < cp.size(); i++)
+	for (size_t j = 0; j < pixelsByCell.size(); j++)
 	{
-		x2 = cp[i].first - com[0];
-		y2 = cp[i].second - com[1];
+		x2 = pixelsByCell[j].first - centroids.first;
+		y2 = pixelsByCell[j].second - centroids.second;
 
-		double side = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+		side = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
 
-		if (side > 0) {
-
-			model->setPixel(cp[i], newID);
+		if(side > 0)
+		{
+			model->setPixel(pixelsByCell[j], nid);
 		}
 
 	}
-
-	//update cellvolumes
-	this->model->updateCellVolumes();
 
 }
