@@ -20,16 +20,6 @@ bool DiceSet::contains(int uniqueID)
 
 	return false;
 
-
-
-
-	//for (std::pair<int, int> element : indices)
-	//{
-	//	if (uniqueID == element.first)
-	//		return true;
-	//}
-
-	//return false;
 }
 
 void DiceSet::insert(int uniqueID)

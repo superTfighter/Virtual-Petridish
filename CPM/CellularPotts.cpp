@@ -113,7 +113,6 @@ void CellularPotts::monteCarloStep()
 		postMCstepFunctions[i]();
 	}
 
-	//TODO:MAKE IT THREADSAFE
 	if(cellDivision)
 	{
 		GridManadger manadger = GridManadger(this);
@@ -134,7 +133,6 @@ void CellularPotts::monteCarloStep()
 
 			if(cellVolume > cellMaxVolume*0.95 && random < 0.1)
 			{
-
 				manadger.divideCell(cellID);
 			}
 

@@ -42,7 +42,6 @@ bool Simulation::stopSimulation()
 		//TODO: STOP THIS
 		simulationRunning = false;
 
-
 	}
 
 	return !simulationRunning;
@@ -72,7 +71,7 @@ void Simulation::setupSimulation(int number)
 
 		p = Parameters(3, { {0,20},{20,100} }, 20.0f, { 0,5 }, { 0,10 }, { 0,0 }, { 0,0 });
 
-		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
+		model = CellularPotts(std::pair<int, int>(250, 250), &p);
 
 		int init_i = 0;
 		int block_size = this->model.grid.size.first / calc_thread.size();
@@ -182,8 +181,8 @@ void Simulation::setupSimulation(int number)
 
 		srand(time(NULL));
 
-		p = Parameters(1, { {0,20},{20,1000} }, 20.0f, { 0,15 }, { 0,500 }, { 0,0 }, { 0,0 });
-		model = CellularPotts(std::pair<int, int>(2500, 2500), &p);
+		p = Parameters(1, { {0,20},{20,-100} }, 20.0f, { 0,15 }, { 0,1500 }, { 0,0 }, { 0,0 });
+		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
 
 		model.setPixel(std::pair<int, int>(model.grid.size.first / 2, model.grid.size.second / 2), model.makeNewCellID(1));
 
