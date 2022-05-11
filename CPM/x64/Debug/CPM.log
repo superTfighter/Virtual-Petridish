@@ -1,15 +1,1 @@
-﻿  Display.cpp
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\OpenCL.h(9,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(52,48): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(52,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(89,64): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(89,40): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(96,57): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(96,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(106,64): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(106,40): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(107,39): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(176,48): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(176,34): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\CPM\Display.cpp(177,43): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-  CPM.vcxproj -> C:\Users\Lex Tomi\Documents\egyetem\Virtual-Petridish-master\x64\Debug\CPM.exe
+﻿  CPM.vcxproj -> Z:\Egyetem\Projects\Virtual-Petridish\x64\Debug\CPM.exe
