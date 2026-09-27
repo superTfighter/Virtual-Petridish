@@ -1,6 +1,7 @@
 #include "Display.h"
 #include <iostream>
 #include <cstdint>
+#include <algorithm>
 
 #ifdef _WIN32
 Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
@@ -10,6 +11,8 @@ Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
 
 
 	showExampleChooser = true;
+	sandboxMode = false;
+	selectedKind = 1;
 }
 #else
 Display::Display(Simulation* simulation)
@@ -17,6 +20,8 @@ Display::Display(Simulation* simulation)
 	this->simulation = simulation;
 
 	showExampleChooser = true;
+	sandboxMode = false;
+	selectedKind = 1;
 }
 #endif
 
@@ -70,13 +75,14 @@ void Display::ExampleChooser()
 
 	ImGui::Separator();
 
-	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Wound healing", "Cell Division" };
+	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Wound healing", "Perimeter Demo", "Adhesion + Migration", "Cell Division", "Sandbox" };
 	static int item_current = -1;
 	ImGui::ListBox("Choose your simulation!", &item_current, items, IM_ARRAYSIZE(items), 4);
 
 	if (item_current != -1)
 	{
 		showExampleChooser = false;
+		sandboxMode = (item_current == 9);
 
 		simulation->setupSimulation(item_current);
 
@@ -111,6 +117,35 @@ void Display::showProject(int projectNumber)
 	ImGui::Image((void*)(intptr_t)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
 #endif
 
+	if (sandboxMode && ImGui::IsItemHovered() && ImGui::IsItemClicked(ImGuiMouseButton_Left))
+	{
+		ImVec2 itemMin = ImGui::GetItemRectMin();
+		ImVec2 mousePos = ImGui::GetMousePos();
+
+		float local_x = mousePos.x - itemMin.x;
+		float local_y = mousePos.y - itemMin.y;
+
+		float W_disp = (width - (width * 0.3f)) - 100;
+		float H_disp = (height - (height * 0.2f));
+
+		if (local_x >= 0 && local_x < W_disp && local_y >= 0 && local_y < H_disp)
+		{
+			float u = local_x / W_disp;
+			float v = local_y / H_disp;
+
+			// The render buffer is packed x-major/y-minor, so screen-horizontal
+			// maps to grid-y and screen-vertical maps to grid-x (transposed
+			// from naive expectation -- see Grid::pointToIndex).
+			int grid_y = (int)(u * this->simulation->model.grid.size.second);
+			int grid_x = (int)(v * this->simulation->model.grid.size.first);
+
+			grid_x = std::max(0, std::min(grid_x, this->simulation->model.grid.size.first - 1));
+			grid_y = std::max(0, std::min(grid_y, this->simulation->model.grid.size.second - 1));
+
+			this->simulation->model.addCellAt(std::pair<int, int>(grid_x, grid_y), this->selectedKind);
+		}
+	}
+
 	//ImGui::Image((void*)my_texture, ImVec2(my_image_width, my_image_height));
 	ImGui::End();
 
@@ -129,6 +164,65 @@ void Display::showParameters()
 	Parameters* parameters = &this->simulation->p;
 
 	ImGui::Begin("Parameters", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+	if (ImGui::Button("Restart Simulation"))
+	{
+		// Stops (and joins) the running Monte Carlo thread, then routes back
+		// to the scenario picker -- picking a scenario there already does a
+		// full setupSimulation()+runSimulation() reset.
+		this->simulation->stopSimulation();
+		this->showExampleChooser = true;
+	}
+
+	ImGui::Separator();
+
+	// Resets to 0 (fastest) on every Restart/scenario-switch/Clear Sandbox,
+	// since those all reconstruct CellularPotts from scratch -- intentional,
+	// not a bug.
+	int speed = this->simulation->model.stepDelayMs.load();
+	if (ImGui::SliderInt("Simulation Speed (delay ms, 0=fastest)", &speed, 0, 200))
+	{
+		this->simulation->model.stepDelayMs.store(speed);
+	}
+
+	ImGui::Separator();
+
+	if (sandboxMode)
+	{
+		ImGui::Text("Sandbox Controls");
+
+		ImGui::RadioButton("Kind 1", &this->selectedKind, 1); ImGui::SameLine();
+		ImGui::RadioButton("Kind 2", &this->selectedKind, 2); ImGui::SameLine();
+		ImGui::RadioButton("Kind 3", &this->selectedKind, 3);
+
+		if (ImGui::Button("Add Random Cell"))
+		{
+			int max_attempts = 1000;
+			auto& grid = this->simulation->model.grid;
+
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % grid.size.first, rand() % grid.size.second);
+
+				if (grid.pixti(grid.pointToIndex(point)) == 0)
+				{
+					this->simulation->model.addCellAt(point, this->selectedKind);
+					break;
+				}
+			}
+		}
+
+		if (ImGui::Button("Clear Sandbox"))
+		{
+			// Resets in place (stays in sandbox view) -- unlike "Restart
+			// Simulation" above, which routes back to the scenario picker.
+			this->simulation->stopSimulation();
+			this->simulation->setupSimulation(9);
+			this->simulation->runSimulation();
+		}
+
+		ImGui::Separator();
+	}
 
 	ImGui::Text("Simulation parameters");
 

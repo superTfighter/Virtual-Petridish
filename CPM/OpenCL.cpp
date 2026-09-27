@@ -27,7 +27,7 @@ OpenCL::OpenCL()
 
 	device = devices.front();
 
-	std::cout << "Default device choosen: " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
+	std::cout << "Default device chosen: " << device.getInfo<CL_DEVICE_VENDOR>() << std::endl;
 
 	std::ifstream invertFile("kernel.cl");
 
@@ -69,18 +69,39 @@ unsigned char* OpenCL::getRenderImage(CellularPotts* model, ActivityContraint* a
 	cl::CommandQueue queue(context, device);
 
 
+	// pixelsArray is stored with the grid's padded row stride (x_step >= sizeY), so
+	// the GPU buffer must hold the full padded array, not just sizeX*sizeY elements,
+	// or the kernel's (x << y_bits) + y indexing reads out of bounds / wrong rows.
+	const size_t pixelArrayLength = model->grid._pixelArray.size();
+
+	// Per-cell-ID -> kind lookup so the kernel can color cells by kind
+	// instead of by raw ID. Cell IDs are allocated sequentially from 1
+	// (CellularPotts::makeNewCellID/setCellKind), so cellTypeToKind always
+	// has exactly getCellCount()+1 entries with no gaps -- safe to rebuild
+	// fresh every frame from 1..getCellCount().
+	int cellCount = model->getCellCount();
+	std::vector<cl_int> kindOfCell(cellCount + 1, 0);
+	for (int id = 1; id <= cellCount; id++)
+	{
+		kindOfCell[id] = model->getCellKind(id);
+	}
+
 	cl::Buffer memBuf(context, 0, model->grid.size.first * model->grid.size.second * bytePerPixel * sizeof(unsigned char));
 	queue.enqueueWriteBuffer(memBuf, true, 0, model->grid.size.first * model->grid.size.second * bytePerPixel * sizeof(unsigned char), image);
 
-	cl::Buffer memBuf2(context, 0, model->grid.size.first * model->grid.size.second * sizeof(unsigned int));
-	queue.enqueueWriteBuffer(memBuf2, true, 0, model->grid.size.first * model->grid.size.second * sizeof(unsigned int), pixelsArray);
+	cl::Buffer memBuf2(context, 0, pixelArrayLength * sizeof(unsigned int));
+	queue.enqueueWriteBuffer(memBuf2, true, 0, pixelArrayLength * sizeof(unsigned int), pixelsArray);
+
+	cl::Buffer kindBuf(context, 0, kindOfCell.size() * sizeof(cl_int));
+	queue.enqueueWriteBuffer(kindBuf, true, 0, kindOfCell.size() * sizeof(cl_int), kindOfCell.data());
 
 	cl::Kernel kernel(program, "calculate", &err);
 	kernel.setArg(0, memBuf);
 	kernel.setArg(1, memBuf2);
-	kernel.setArg(2, sizeX);
-	kernel.setArg(3, sizeY);
-	kernel.setArg(4, y_bits);
+	kernel.setArg(2, kindBuf);
+	kernel.setArg(3, sizeX);
+	kernel.setArg(4, sizeY);
+	kernel.setArg(5, y_bits);
 
 
 	auto maxBlockNumber = device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
@@ -101,8 +122,8 @@ unsigned char* OpenCL::getRenderImage(CellularPotts* model, ActivityContraint* a
 	memBuf2 = cl::Buffer(context, 0, model->grid.size.first * model->grid.size.second * sizeof(unsigned int));
 	queue.enqueueWriteBuffer(memBuf2, true, 0, model->borderpixels.elements.size() * sizeof(unsigned int), bordersArray);
 
-	cl::Buffer memBuf3(context, 0, model->grid.size.first * model->grid.size.second * sizeof(unsigned int));
-	queue.enqueueWriteBuffer(memBuf3, true, 0, model->grid.size.first * model->grid.size.second * sizeof(unsigned int), pixelsArray);
+	cl::Buffer memBuf3(context, 0, pixelArrayLength * sizeof(unsigned int));
+	queue.enqueueWriteBuffer(memBuf3, true, 0, pixelArrayLength * sizeof(unsigned int), pixelsArray);
 
 	kernel = cl::Kernel(program, "border", &err);
 	kernel.setArg(0, memBuf);

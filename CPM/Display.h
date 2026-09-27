@@ -16,7 +16,6 @@
 #include "VolumeConstraint.h"
 #include "PerimeterConstraint.h"
 #include "PixelsByCell.h"
-#include "Centroids.h"
 #include "Simulation.h"
 
 class Display
@@ -43,6 +42,8 @@ public:
 
 private:
 	bool showExampleChooser;
+	bool sandboxMode;
+	int selectedKind;
 	void ExampleChooser();
 	void showProject(int projectNumber);
 	void showParameters();

@@ -37,11 +37,17 @@ bool Simulation::runSimulation()
 
 bool Simulation::stopSimulation()
 {
-	if (!simulationRunning)
+	if (simulationRunning)
 	{
-		//TODO: STOP THIS
-		simulationRunning = false;
+		model.stopRequested = true;
 
+		// runSimulation() only ever populates threadPool[0]; join it before
+		// letting a subsequent runSimulation() reassign a std::thread that's
+		// still joinable, which would call std::terminate().
+		if (threadPool->at(0).joinable())
+			threadPool->at(0).join();
+
+		simulationRunning = false;
 	}
 
 	return !simulationRunning;
@@ -49,7 +55,7 @@ bool Simulation::stopSimulation()
 
 void Simulation::setupSimulation(int number)
 {
-	//PARALELL STUFF
+	//PARALLEL STUFF
 	std::vector<std::thread> calc_thread = std::vector<std::thread>(4);
 
 
@@ -69,12 +75,9 @@ void Simulation::setupSimulation(int number)
 	{
 		srand(time(NULL));
 
-		p = Parameters(3, { {0,20},{20,100} }, 20.0f, { 0,5 }, { 0,10 }, { 0,0 }, { 0,0 });
+		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,5 }, { 0,10 }, { 0,0 }, { 0,0 });
 
 		model = CellularPotts(std::pair<int, int>(250, 250), &p);
-
-		int init_i = 0;
-		int block_size = this->model.grid.size.first / calc_thread.size();
 
 		auto cellId = model.makeNewCellID(1);
 
@@ -97,13 +100,9 @@ void Simulation::setupSimulation(int number)
 	else if (number == 2) { //EPHILIA
 
 		srand(time(NULL));
-		p = Parameters(1, { {0,0},{0,-2} }, 50.0f, { 0,700 }, { 0,15000 }, { 0,3 }, { 0,0 });
+		p = Parameters(1, { {0,0},{0,-2} }, 50.0f, { 0,5 }, { 0,100 }, { 0,3 }, { 0,40 });
 
 		model = CellularPotts(std::pair<int, int>(500, 500), &p);
-
-		int init_i = 0;
-		int block_size = this->model.grid.size.first / calc_thread.size();
-
 
 		for (size_t x = 0; x < model.grid.size.first; x += 10)
 		{
@@ -116,11 +115,10 @@ void Simulation::setupSimulation(int number)
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
+		model.addConstraint(&peremiter);
 
 	}
-	else if (number == 3) {
-
-		//TODO:CellSorting
+	else if (number == 3) { //CELLSORTING
 
 		srand(time(NULL));
 		p = Parameters(2, { {0,12,6},{12,6,16},{6,16,6} }, 15.0f, { 0,2,2 }, { 0,25,25 }, { 0,0 }, { 0,0 });
@@ -130,9 +128,21 @@ void Simulation::setupSimulation(int number)
 		int n = 500;
 		int max_attempts = 10 * n;
 
-		model.setPixel(std::pair<int, int>(50, 50), model.makeNewCellID(1));	
-		model.setPixel(std::pair<int, int>(25, 25), model.makeNewCellID(2));
-		
+		for (int i = 0; i < n; i++)
+		{
+			int kind = (i % 2 == 0) ? 1 : 2; // intermix the two kinds 1:1
+
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(kind));
+					break;
+				}
+			}
+		}
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
@@ -144,40 +154,116 @@ void Simulation::setupSimulation(int number)
 		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,200 }, { 0,2000 }, { 0,0 }, { 0,0 });
 		model = CellularPotts(std::pair<int, int>(1000, 1000), &p);
 
+		int numCells = 7;
+		int max_attempts = 1000;
 
-		model.setPixel(std::pair<int, int>(100, 100), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(100, 250), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(200, 250), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(250, 100), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(300, 250), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(350, 300), model.makeNewCellID(1));
-		model.setPixel(std::pair<int, int>(450, 450), model.makeNewCellID(1));
+		for (int i = 0; i < numCells; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
 
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(1));
+					break;
+				}
+			}
+		}
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
 	}
-	else if (number == 5) {
+	else if (number == 5) { //WOUND HEALING
 
 		srand(time(NULL));
 
-		p = Parameters(1, { {0,100},{100,-100} }, 20.0f, { 0,150 }, { 0,625 }, { 0,0 }, { 0,0 });
+		p = Parameters(1, { {0,100},{100,-100} }, 20.0f, { 0,150 }, { 0,625 }, { 0,0 }, { 0,0 },
+		               "geometric", { 0,50 }, { 0,50 });
 		model = CellularPotts(std::pair<int, int>(500, 500), &p);
 
-		for (size_t i = 0; i < 500; i+=50)
+		// Two dense near-confluent bands (rows y=0..79 and y=420..499) with a
+		// real ~340px gap between them -- a wound, not just an empty field.
+		for (size_t x = 0; x < 500; x += 5)
 		{
-			model.setPixel(std::pair<int, int>(i, 10), model.makeNewCellID(1));
-			model.setPixel(std::pair<int, int>(i, 490), model.makeNewCellID(1));
+			for (size_t j = 0; j < 80; j += 5)
+			{
+				model.setPixel(std::pair<int, int>(x, j), model.makeNewCellID(1));
+			}
+			for (size_t j = 420; j < 500; j += 5)
+			{
+				model.setPixel(std::pair<int, int>(x, j), model.makeNewCellID(1));
+			}
 		}
 
-	
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
+		model.addConstraint(&activity);
 
 		model.cellDivision = true;
 
 	}
-	else if (number == 6) {
+	else if (number == 6) { //PERIMETER DEMO
+
+		srand(time(NULL));
+
+		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,10 }, { 0,900 }, { 0,4 }, { 0,120 });
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		int numCells = 6;
+		int max_attempts = 1000;
+
+		for (int i = 0; i < numCells; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(1));
+					break;
+				}
+			}
+		}
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+		model.addConstraint(&peremiter);
+	}
+	else if (number == 7) { //ADHESION + MIGRATION
+
+		srand(time(NULL));
+
+		p = Parameters(2, { {0,12,6},{12,6,16},{6,16,6} }, 15.0f, { 0,2,2 }, { 0,25,25 }, { 0,0 }, { 0,0 },
+		               "geometric", { 0,40,40 }, { 0,40,40 });
+
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		int n = 300;
+		int max_attempts = 10 * n;
+
+		for (int i = 0; i < n; i++)
+		{
+			int kind = (i % 2 == 0) ? 1 : 2;
+
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(kind));
+					break;
+				}
+			}
+		}
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+		model.addConstraint(&activity);
+	}
+	else if (number == 8) { //CELL DIVISION
 
 		srand(time(NULL));
 
@@ -191,6 +277,19 @@ void Simulation::setupSimulation(int number)
 
 		model.cellDivision = true;
 
+	}
+	else if (number == 9) { //SANDBOX
+
+		srand(time(NULL));
+
+		p = Parameters(3, { {0,20,20,20},{20,50,20,20},{20,20,50,20},{20,20,20,50} }, 20.0f,
+		               { 0,5,5,5 }, { 0,500,500,500 }, { 0,0,0,0 }, { 0,0,0,0 });
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+
+		model.cellDivision = false;
 	}
 
 	std::cout << "Setup done" << std::endl;

@@ -26,7 +26,6 @@ add_executable(CPM
     ${CPM_DIR}/AdhesionConstraint.cpp
     ${CPM_DIR}/Cell.cpp
     ${CPM_DIR}/CellularPotts.cpp
-    ${CPM_DIR}/Centroids.cpp
     ${CPM_DIR}/DiceSet.cpp
     ${CPM_DIR}/Display.cpp
     ${CPM_DIR}/DisplayHelper.cpp

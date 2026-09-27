@@ -1,4 +1,5 @@
 #include "ActivityContraint.h"
+#include <stdexcept>
 
 ActivityContraint::ActivityContraint()
 {
@@ -9,7 +10,7 @@ float ActivityContraint::deltaH(int sourceI, int targetI, int source_type, int t
 {
 
 	if (this->model->parameters->ACT_MEAN == "false")
-		throw "Activity contraint used when not active";
+		throw std::runtime_error("ActivityContraint used when not active");
 
 	float deltaH = 0;
 	float  maxAct = 0;
@@ -64,12 +65,14 @@ void ActivityContraint::postMCSListener()
 float ActivityContraint::activityAt(int index)
 {
 	if (this->model->parameters->ACT_MEAN == "false")
-		throw "Activity contraint used when not active";
+		throw std::runtime_error("ActivityContraint used when not active");
 
 	if (this->model->parameters->ACT_MEAN == "geometric")
 		return activityAtGeom(index);
 	else if (this->model->parameters->ACT_MEAN == "arithmetic")
 		return activityAtArith(index);
+
+	throw std::runtime_error("ActivityContraint: unknown ACT_MEAN \"" + this->model->parameters->ACT_MEAN + "\"");
 }
 
 float ActivityContraint::activityAtArith(int index)

@@ -1,18 +1,71 @@
 #include "CellularPotts.h"
 #include "PixelsByCell.h"
+#include <stdexcept>
 
 
 
 CellularPotts::CellularPotts() : grid(0, 0)
 {
-	Parameters p;
-	init(std::pair<int, int>{0, 0}, & p);
+	init(std::pair<int, int>{0, 0}, &defaultParameters);
 }
 
-//TODOD:OPTIMIZE THESE!!
+//TODO:OPTIMIZE THESE!!
 CellularPotts::CellularPotts(std::pair<int, int> gridSize, Parameters* parameters) : grid(gridSize.first, gridSize.second), parameters(parameters)
 {
 	this->init(gridSize, parameters);
+}
+
+CellularPotts::CellularPotts(const CellularPotts& other) :
+	cells(other.cells),
+	grid(other.grid),
+	parameters(other.parameters),
+	borderpixels(other.borderpixels),
+	simTime(other.simTime),
+	executing(other.executing.load()),
+	canExecute(other.canExecute.load()),
+	stopRequested(other.stopRequested.load()),
+	stepDelayMs(other.stepDelayMs.load()),
+	cellDivision(other.cellDivision),
+	postMCstepFunctions(other.postMCstepFunctions),
+	last_cell_id(other.last_cell_id),
+	cellVolume(other.cellVolume),
+	cellTypeToKind(other.cellTypeToKind),
+	_neighbours(other._neighbours),
+	contraints(other.contraints),
+	makingANewCellID(other.makingANewCellID.load()),
+	settingAPixel(other.settingAPixel.load()),
+	previousImage(other.previousImage),
+	defaultParameters(other.defaultParameters)
+{
+}
+
+CellularPotts& CellularPotts::operator=(const CellularPotts& other)
+{
+	if (this == &other)
+		return *this;
+
+	cells = other.cells;
+	grid = other.grid;
+	parameters = other.parameters;
+	borderpixels = other.borderpixels;
+	simTime = other.simTime;
+	executing = other.executing.load();
+	canExecute = other.canExecute.load();
+	stopRequested = other.stopRequested.load();
+	stepDelayMs = other.stepDelayMs.load();
+	cellDivision = other.cellDivision;
+	postMCstepFunctions = other.postMCstepFunctions;
+	last_cell_id = other.last_cell_id;
+	cellVolume = other.cellVolume;
+	cellTypeToKind = other.cellTypeToKind;
+	_neighbours = other._neighbours;
+	contraints = other.contraints;
+	makingANewCellID = other.makingANewCellID.load();
+	settingAPixel = other.settingAPixel.load();
+	previousImage = other.previousImage;
+	defaultParameters = other.defaultParameters;
+
+	return *this;
 }
 
 void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
@@ -21,6 +74,8 @@ void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 	makingANewCellID = false;
 	settingAPixel = false;
 	executing = false;
+	stopRequested = false;
+	stepDelayMs = 0;
 	cellDivision = false;
 
 
@@ -67,6 +122,9 @@ std::vector<HamiltonianConstraint*> CellularPotts::getAllContraints()
 //TODO:REFACTOR THIS
 void CellularPotts::monteCarloStep()
 {
+	if (this->borderpixels.length == 0)
+		return;
+
 	float delta_t = 0.0f;
 
 	while (delta_t < 1.0f)
@@ -149,8 +207,9 @@ void CellularPotts::monteCarloStep()
 void CellularPotts::monteCarloParallel()
 {
 	canExecute = true;
+	stopRequested = false;
 
-	while (true)
+	while (!stopRequested)
 	{
 		executing = true;
 
@@ -158,6 +217,11 @@ void CellularPotts::monteCarloParallel()
 			monteCarloStep();
 
 		executing = false;
+
+		int delay = stepDelayMs.load();
+
+		if (delay > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(delay));
 	}
 }
 
@@ -262,7 +326,10 @@ void CellularPotts::updateCellVolumes()
 
 	for (size_t i = 1; i < this->cellTypeToKind.size(); i++)
 	{
-		int cellvolume = cp[i].size();
+		// cp only grows to cover cell IDs that actually appear on the grid,
+		// so a cell with zero pixels currently painted (e.g. a division that
+		// put none of the parent's pixels on this side) has no entry here.
+		int cellvolume = (i < cp.size()) ? cp[i].size() : 0;
 
 		this->cellVolume[i] = cellvolume;
 	}
@@ -290,9 +357,9 @@ bool CellularPotts::docopy(float deltaH)
 	if (deltaH < 0)
 		return true;
 
-	int random = (rand() % 2);
+	float random = (float)rand() / (float)RAND_MAX;
 
-	return (int)random < (float)std::exp(-deltaH / this->parameters->T);
+	return random < (float)std::exp(-deltaH / this->parameters->T);
 }
 
 //deprecated
@@ -349,12 +416,12 @@ void CellularPotts::setPixelI(int cellId, int sourceType)
 		this->cellVolume[type_old]--;
 		cells[type_old - 1].V--;
 
-		if (this->cellVolume[type_old] == 0)
-		{
-			//TODO: Remove cellvolume and tk2 and nr_of_cells
-
-			throw "Not implemented yet!";
-		}
+		// A cell whose last pixel is taken by a neighbor simply disappears --
+		// its ID/kind stays recorded (cellTypeToKind, cells[]) but it owns no
+		// pixels from here on, same as any other zero-volume ID. Nothing else
+		// needs updating: updateCellVolumes() recomputes cellVolume from the
+		// actual pixel counts every MCS anyway, rendering only ever shows
+		// pixels that exist, and division checks a positive volume already.
 	}
 
 	this->grid.setpixi(cellId, sourceType);
@@ -452,6 +519,42 @@ std::vector<std::pair<int, int>> CellularPotts::getBorderPixels()
 		return getBorderPixels();
 	}
 
+}
+
+bool CellularPotts::addCellAt(std::pair<int, int> point, int kind)
+{
+	if (point.first < 0 || point.first >= this->grid.size.first ||
+	    point.second < 0 || point.second >= this->grid.size.second)
+		return false;
+
+	if (!executing)
+	{
+		canExecute = false;
+
+		bool success = false;
+
+		if (this->grid.pixti(this->grid.pointToIndex(point)) == 0)
+		{
+			int id = this->makeNewCellID(kind);
+			this->setPixel(point, id);
+			success = true;
+		}
+
+		canExecute = true;
+
+		return success;
+	}
+	else
+	{
+		canExecute = false;
+
+		while (executing)
+		{
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+		}
+
+		return addCellAt(point, kind);
+	}
 }
 
 void CellularPotts::birth(int childID, int parentID)
@@ -641,11 +744,6 @@ unsigned char* CellularPotts::getRenderImage(std::vector<int>& activityVector)
 int CellularPotts::getCellCount()
 {
 	return this->cellTypeToKind.size()-1;
-}
-
-int CellularPotts::getCellTypeCount()
-{
-	return 0;
 }
 
 float CellularPotts::getAreaCoveredByCells()

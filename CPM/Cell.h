@@ -19,7 +19,7 @@ public:
 	float V;
 	std::vector<Cell> products;
 
-	void birth(Cell parentID);
+	void birth(Cell& parentID);
 
 private:
 

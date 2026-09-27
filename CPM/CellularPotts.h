@@ -8,6 +8,7 @@
 #include <thread>
 #include "GridManadger.h"
 #include <random>
+#include <atomic>
 
 
 
@@ -23,6 +24,14 @@ public:
 	CellularPotts();
 
 	CellularPotts(std::pair<int, int> gridSize, Parameters *parameters);
+
+	// Explicit copy ctor/assignment needed because std::atomic<bool> members
+	// (executing/canExecute/stopRequested/makingANewCellID/settingAPixel) are
+	// not copyable by default; Simulation::setupSimulation() relies on
+	// `model = CellularPotts(...)` to reset the simulation, so this must stay
+	// assignable.
+	CellularPotts(const CellularPotts& other);
+	CellularPotts& operator=(const CellularPotts& other);
 
 	void init(std::pair<int, int> gridSize, Parameters* parameters);
 
@@ -41,6 +50,7 @@ public:
 
 	void setPixelI(int cellId, int sourceType);
 	void setPixel(std::pair<int, int> point, int sourceType);
+	bool addCellAt(std::pair<int, int> point, int kind);
 
 	int getCellVolume(int cellId);
 	void updateCellVolumes();
@@ -56,8 +66,10 @@ public:
 
 	void birth(int childID,int parentID);
 
-	bool executing;
-	bool canExecute;
+	std::atomic<bool> executing;
+	std::atomic<bool> canExecute;
+	std::atomic<bool> stopRequested;
+	std::atomic<int> stepDelayMs;
 	bool cellDivision;
 
 	std::vector<void (*)()> postMCstepFunctions;
@@ -68,11 +80,9 @@ public:
 	unsigned char* getRenderImage(std::vector<int>& activityVector);
 
 	int getCellCount();
-	int getCellTypeCount();
 	float getAreaCoveredByCells();
 
 private:
-	int number_of_cells;
 	int last_cell_id;
 
 	float deltaH(int sourceIndex,int targetIndex,int sourceType,int targetType);
@@ -86,9 +96,14 @@ private:
 
 	std::vector<HamiltonianConstraint*> contraints;
 
-	bool makingANewCellID;
-	bool settingAPixel;
+	std::atomic<bool> makingANewCellID;
+	std::atomic<bool> settingAPixel;
 
 	char* previousImage;
+
+	// Owns the Parameters instance the default ctor points `parameters` at,
+	// so it isn't a dangling pointer to a stack temporary that's already
+	// been destroyed by the time anyone dereferences it.
+	Parameters defaultParameters;
 };
 

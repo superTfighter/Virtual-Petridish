@@ -7,7 +7,6 @@
 #include "PerimeterConstraint.h"
 #include "ActivityContraint.h"
 #include "PixelsByCell.h"
-#include "Centroids.h"
 #include <thread>
 #include "OpenCL.h"
 

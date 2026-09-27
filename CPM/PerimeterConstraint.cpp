@@ -76,39 +76,52 @@ float PerimeterConstraint::deltaH(int sourceI, int targetI, int source_type, int
 		const auto hnew = (ps + pchange[target_type]) - pt;
 		const auto hold = ps - pt;
 
-		r += ls * ((hnew * hnew) - (hold * hold));
+		r += lt * ((hnew * hnew) - (hold * hold));
 
 	}
 
 	return r;
 }
 
+void PerimeterConstraint::recomputeCellPerimeters()
+{
+	cellPerimeters.clear();
+
+	// Iterate model->borderpixels directly rather than through
+	// getBorderPixels(): that method gates on the executing/canExecute
+	// flags to stay safe when called from a *different* thread (the render
+	// thread), but postMCSListener() runs synchronously on the sim thread
+	// itself, inside the same monteCarloStep() call that already holds
+	// exclusive access -- going through getBorderPixels()'s gate here would
+	// spin forever waiting for executing to clear, which this very call is
+	// blocking (a self-deadlock).
+	const auto neighbourCounts = this->model->perimeterNeighbours();
+
+	for (const auto& index : this->model->borderpixels.elements)
+	{
+		auto cellID = this->model->grid.pixti(index);
+
+		if (cellID != 0)
+		{
+			cellPerimeters[cellID] += neighbourCounts[index];
+		}
+	}
+}
+
 void PerimeterConstraint::afterSetModelMethod()
 {
-	auto borderPixels = this->model->getBorderPixels();
+	recomputeCellPerimeters();
+}
 
-	for (size_t i = 0; i < borderPixels.size(); i++)
-	{
-		auto cellID = this->model->grid.pixti(this->model->grid.pointToIndex(borderPixels[i]));
-
-		if (cellID != -1)
-		{
-
-			if (cellPerimeters.count(cellID)) 
-			{
-				const auto index = this->model->grid.pointToIndex(borderPixels[i]);
-
-				cellPerimeters[cellID] += this->model->perimeterNeighbours()[index];
-			}
-			else 
-			{
-				cellPerimeters[cellID] = 0;
-
-			};
-		}
-
-	}
-
+void PerimeterConstraint::postMCSListener()
+{
+	// Recomputed once per full Monte Carlo step (not per pixel copy): a
+	// single-pixel change can shift several neighboring cells' perimeters
+	// at once, so a targeted incremental update would be substantially more
+	// complex to get right; recomputing here (rather than every accepted
+	// pixel copy) keeps the cost at O(border pixels) per step instead of
+	// O(border pixels) per copy, which matters once there are many cells.
+	recomputeCellPerimeters();
 }
 
 

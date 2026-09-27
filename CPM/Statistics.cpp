@@ -7,8 +7,6 @@ std::vector<std::vector<std::pair<int, int>>> Statistics::PixelsByCell()
 
 	std::vector<std::vector<std::pair<int, int>>> pixelsByCell = std::vector<std::vector<std::pair<int, int>>>();
 
-	pixelsByCell.size();
-
 	for (size_t i = 0; i < pixels.size(); i++)
 	{
 
@@ -26,9 +24,6 @@ std::vector<std::vector<std::pair<int, int>>> Statistics::PixelsByCell()
 			//INSERT POSITION TO THAT TYPE
 
 			pixelsByCell[pixels[i]].push_back(pos);
-
-			int a = 0;
-
 		}
 
 	}

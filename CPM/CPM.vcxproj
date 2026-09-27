@@ -153,7 +153,6 @@
     <ClCompile Include="AdhesionConstraint.cpp" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="CellularPotts.cpp" />
-    <ClCompile Include="Centroids.cpp" />
     <ClCompile Include="DiceSet.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="DisplayHelper.cpp" />
@@ -182,7 +181,6 @@
     <ClInclude Include="AdhesionConstraint.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="CellularPotts.h" />
-    <ClInclude Include="Centroids.h" />
     <ClInclude Include="DiceSet.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="DisplayHelper.h" />

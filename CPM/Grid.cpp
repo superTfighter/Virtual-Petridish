@@ -16,8 +16,6 @@ Grid::Grid(int xSize, int ySize)
 
 	this->middle = std::pair<int,int>(xSize / 2, ySize / 2);
 
-	neighbours.resize(8);
-
 	actuallyRenderPixelArray.resize(size.first*size.second);
 }
 
@@ -66,6 +64,8 @@ void Grid::setPixel(std::pair<int, int> point, int value)
 /// <returns></returns>
 std::vector<int> Grid::neighi(int index)
 {
+	std::vector<int> neighbours(8);
+
 	int tl, tm, tr, l, r, bl, bm, br;
 
 	tl = index - 1 - this->x_step;

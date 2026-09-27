@@ -12,7 +12,7 @@ float PersistenceConstraint::deltaH(int sourceI, int targetI, int source_type, i
 	std::map<int, int> a;
 
 	a[0] = p2.first - p1.first;
-	a[1] = p2.second - p2.second;
+	a[1] = p2.second - p1.second;
 
 	float dp = 0.0f;
 	dp += a[0] * b.first;

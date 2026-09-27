@@ -9,7 +9,7 @@ Cell::Cell(CellularPotts* model, int kindID, int cellID)
 	this->parentID = -1;
 }
 
-void Cell::birth(Cell parentID)
+void Cell::birth(Cell& parentID)
 {
 	this->parentID = parentID.cellID;
 

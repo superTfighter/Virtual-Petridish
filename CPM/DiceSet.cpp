@@ -1,4 +1,5 @@
 #include "DiceSet.h"
+#include <stdexcept>
 
 
 DiceSet::DiceSet()
@@ -58,8 +59,8 @@ int DiceSet::sample()
 	std::uniform_real_distribution<double> dis(0, size);
 
 	if(size <= 0)
-	{	
-		throw "Error";
+	{
+		throw std::runtime_error("DiceSet::sample() called on an empty set");
 	}
 
 	int index = dis(this->generator);

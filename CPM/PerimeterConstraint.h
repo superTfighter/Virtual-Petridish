@@ -15,11 +15,11 @@ public:
 
 	float deltaH(int sourceI, int targetI, int  source_type, int target_type) override;
 	void afterSetModelMethod() override;
-	//void postSetpixListener(int i, int t_old, int t_new);
+	void postMCSListener() override;
 
 private:
 
-
+	void recomputeCellPerimeters();
 
 	//Perimeter size of each cellID
 	std::map<int, int> cellPerimeters;

@@ -27,9 +27,6 @@ std::vector<std::vector<std::pair<int, int>>> PixelsByCell::getPixelsByCell()
 				std::pair<int, int> p(i, j);
 				int id = _pixelArray[ii];
 
-				if (id == 2)
-					int a = 0;
-
 				int size = cellPixels.size() - 1;
 
 				if(id < size)
