@@ -2,6 +2,23 @@
 #include <iostream>
 #include <cstdint>
 #include <algorithm>
+#include <map>
+#include <utility>
+
+// Standard ImGui "(?)" hover-tooltip idiom, used throughout showParameters()
+// so a control's purpose is visible without needing to guess from its label.
+static void HelpMarker(const char* desc)
+{
+	ImGui::TextDisabled("(?)");
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(300.0f);
+		ImGui::TextUnformatted(desc);
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
 
 #ifdef _WIN32
 Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
@@ -226,22 +243,46 @@ void Display::showParameters()
 
 	ImGui::Text("Simulation parameters");
 
+	// A flat J/V/LAMBDA_V index encodes (kind, state) as kind*NUM_STATES+state
+	// (Parameters::stateIndex) -- decode it back for readable labels. Index 0
+	// is always the reserved "medium" (empty space) slot; when NUM_STATES>1,
+	// indices where kind==0 but state!=0 are unused placeholder rows that no
+	// real cell ever occupies (see the Substates Demo scenario comment) and
+	// are skipped below to avoid showing meaningless controls.
+	auto kindOf = [&](int idx) { return idx / std::max(1, parameters->NUM_STATES); };
+	auto stateOf = [&](int idx) { return idx % std::max(1, parameters->NUM_STATES); };
+	auto isRealSlot = [&](int idx) { return kindOf(idx) != 0 || stateOf(idx) == 0; };
+	auto slotLabel = [&](int idx) -> std::string {
+		int kind = kindOf(idx);
+		if (kind == 0) return "medium";
+		if (parameters->NUM_STATES > 1) return "kind " + std::to_string(kind) + "/state " + std::to_string(stateOf(idx));
+		return "kind " + std::to_string(kind);
+	};
 
 	if (ImGui::TreeNode("Temperature"))
 	{
 		ImGui::SliderFloat("Simulation temp", &parameters->T, 0.0f, 1000.0f, "ratio = %.3f");
+		ImGui::SameLine(); HelpMarker("How much randomness/noise drives cell movement. Higher = cells jitter and reshape more chaotically; lower = movement is more strictly governed by the adhesion/volume energy terms below (more orderly, less lifelike).");
 
 		ImGui::TreePop();
 	}
 
 	if (ImGui::TreeNode("Adhesion"))
 	{
-		for (int i = 0; i < parameters->J.size(); i++)
-		{
-			for (int j = 0; j < parameters->J[i].size(); j++)
-			{
+		ImGui::TextWrapped("How costly (positive) or favorable (negative) it is for two kinds/states to touch. Cells minimize total contact cost, so a very negative value pulls two kinds together and a very positive value keeps them apart.");
 
-				ImGui::SliderInt((std::to_string(i) + " -> " + std::to_string(j)).c_str(), &parameters->J[i][j], -1000, 1000);
+		for (int i = 0; i < (int)parameters->J.size(); i++)
+		{
+			if (!isRealSlot(i))
+				continue;
+
+			for (int j = 0; j < (int)parameters->J[i].size(); j++)
+			{
+				if (!isRealSlot(j))
+					continue;
+
+				std::string label = slotLabel(i) + " <-> " + slotLabel(j);
+				ImGui::SliderInt(label.c_str(), &parameters->J[i][j], -1000, 1000);
 			}
 		}
 
@@ -250,12 +291,17 @@ void Display::showParameters()
 
 	if (ImGui::TreeNode("Volume"))
 	{
+		ImGui::TextWrapped("Each cell has a target size (in pixels) it grows/shrinks toward, and a strength controlling how strongly it resists being away from that target.");
 
 		if (ImGui::BeginTable("split", 3))
 		{
-			for (int i = 0; i < parameters->V.size(); i++)
+			for (int i = 0; i < (int)parameters->V.size(); i++)
 			{
-				ImGui::TableNextColumn(); ImGui::SliderFloat((std::to_string(i) + ". celltype max volume").c_str(), &parameters->V[i], 0, 100000);
+				if (!isRealSlot(i) || kindOf(i) == 0)
+					continue;
+
+				std::string label = slotLabel(i) + " target volume (px)";
+				ImGui::TableNextColumn(); ImGui::SliderFloat(label.c_str(), &parameters->V[i], 0, 100000);
 			}
 
 			ImGui::EndTable();
@@ -265,9 +311,13 @@ void Display::showParameters()
 		if (ImGui::BeginTable("split", 3))
 		{
 
-			for (int i = 0; i < parameters->LAMBDA_V.size(); i++)
+			for (int i = 0; i < (int)parameters->LAMBDA_V.size(); i++)
 			{
-				ImGui::TableNextColumn(); ImGui::SliderFloat((std::to_string(i) + ". celltype volume change").c_str(), &parameters->LAMBDA_V[i], 0, 100);
+				if (!isRealSlot(i) || kindOf(i) == 0)
+					continue;
+
+				std::string label = slotLabel(i) + " volume constraint strength";
+				ImGui::TableNextColumn(); ImGui::SliderFloat(label.c_str(), &parameters->LAMBDA_V[i], 0, 100);
 			}
 
 			ImGui::EndTable();
@@ -291,53 +341,98 @@ void Display::showStatistics()
 	bool open = true;
 	ImGui::Begin("Statistics", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 
+	CellularPotts& model = this->simulation->model;
+	int totalCreated = model.getCellCount();
+	bool useStates = this->simulation->p.NUM_STATES > 1;
+
+	// Tally alive counts/volumes per kind, and per (kind,state) when
+	// substates are in use -- "alive" means it currently owns at least one
+	// pixel (getCellVolume>0); totalCreated also counts cells that have
+	// since been fully consumed/died (see CellularPotts::setPixelI).
+	std::map<int, int> aliveByKind;
+	std::map<int, long long> volumeByKind;
+	std::map<std::pair<int, int>, int> aliveByKindState;
+	std::map<std::pair<int, int>, long long> volumeByKindState;
+	int totalAlive = 0;
+
+	for (int id = 1; id <= totalCreated; id++)
+	{
+		int vol = model.getCellVolume(id);
+		if (vol <= 0)
+			continue;
+
+		int kind = model.getCellKind(id);
+		totalAlive++;
+		aliveByKind[kind]++;
+		volumeByKind[kind] += vol;
+
+		if (useStates)
+		{
+			auto key = std::make_pair(kind, model.getCellState(id));
+			aliveByKindState[key]++;
+			volumeByKindState[key] += vol;
+		}
+	}
+
 	static ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_Resizable | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_ContextMenuInBody;
 
 	if (ImGui::BeginTable("table1", 3, flags))
 	{
-
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Cells alive: %d (created: %d)", totalAlive, totalCreated);
 
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("Number of cells: %d", this->simulation->model.getCellCount());
-
-		ImGui::TableSetColumnIndex(1);
-
-		ImGui::TableSetColumnIndex(2);
+		ImGui::Text("Simulation time: %d", model.simTime);
 
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("Simulation time: %d", this->simulation->model.simTime);
+		float gridArea = (float)(model.grid.size.first * model.grid.size.second);
+		float coveredPercent = gridArea > 0 ? 100.0f * model.getAreaCoveredByCells() / gridArea : 0.0f;
+		ImGui::Text("Area covered: %.1f%%", coveredPercent);
 
-		ImGui::TableSetColumnIndex(1);
-
-		ImGui::TableSetColumnIndex(2);
-
-		ImGui::TableNextRow();
-		ImGui::TableSetColumnIndex(0);
-		ImGui::Text("AreaCovered by cells: %d / %f : %f percent", this->simulation->model.grid.size.first * this->simulation->model.grid.size.second, this->simulation->model.getAreaCoveredByCells(), this->simulation->model.getAreaCoveredByCells() / (this->simulation->model.grid.size.first * this->simulation->model.grid.size.second));
-
-		ImGui::TableSetColumnIndex(1);
-
-		ImGui::TableSetColumnIndex(2);
-
-
-
-		/*for (int row = 0; row < 5; row++)
+		for (auto& kv : aliveByKind)
 		{
-			
-			for (int column = 0; column < 3; column++)
+			int kind = kv.first;
+			int count = kv.second;
+			float avgVol = count > 0 ? (float)volumeByKind[kind] / count : 0.0f;
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Kind %d: %d alive, avg volume %.0f", kind, count, avgVol);
+		}
+
+		if (useStates)
+		{
+			for (auto& kv : aliveByKindState)
 			{
-				ImGui::TableSetColumnIndex(column);
-				ImGui::Text("Hello %d,%d", column, row);
+				int kind = kv.first.first;
+				int state = kv.first.second;
+				int count = kv.second;
+				float avgVol = count > 0 ? (float)volumeByKindState[kv.first] / count : 0.0f;
+
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("  Kind %d / State %d: %d alive, avg volume %.0f", kind, state, count, avgVol);
 			}
-		}*/
+		}
+
+		if (!this->simulation->p.CONSUMPTION_RATE.empty())
+		{
+			double totalResource = 0;
+			for (float r : model.grid._resourceArray)
+				totalResource += r;
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Total resource remaining: %.0f", totalResource);
+		}
+
 		ImGui::EndTable();
 	}
-	
+
 	ImGui::End();
-
-
 }
 
 #ifdef _WIN32

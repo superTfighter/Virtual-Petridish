@@ -7,7 +7,7 @@ __constant uchar4 kindPalette[] = {
 };
 #define KIND_PALETTE_SIZE 5
 
-__kernel void calculate(__global char* image,__global int* pixels, __global int* kindOfCell, int sizeX, int sizeY, int y_bits)
+__kernel void calculate(__global char* image,__global int* pixels, __global int* kindOfCell, __global int* stateOfCell, int sizeX, int sizeY, int y_bits)
 {
 	int global_id = get_global_id(0);
 
@@ -33,9 +33,16 @@ __kernel void calculate(__global char* image,__global int* pixels, __global int*
 		int paletteIndex = ((kind - 1) % KIND_PALETTE_SIZE + KIND_PALETTE_SIZE) % KIND_PALETTE_SIZE;
 		uchar4 color = kindPalette[paletteIndex];
 
-		image[offset] = color.x;
-		image[offset + 1] = color.y;
-		image[offset + 2] = color.z;
+		// Same kind, different substate -> same hue, progressively dimmer
+		// (state 0 = full brightness, floor at 30% so it never goes black).
+		int state = stateOfCell[cellId];
+		if (state < 0) state = 0;
+		int shadePercent = 100 - state * 20;
+		if (shadePercent < 30) shadePercent = 30;
+
+		image[offset] = (color.x * shadePercent) / 100;
+		image[offset + 1] = (color.y * shadePercent) / 100;
+		image[offset + 2] = (color.z * shadePercent) / 100;
 		image[offset + 3] = color.w;
 	}
 

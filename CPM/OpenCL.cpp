@@ -81,9 +81,11 @@ unsigned char* OpenCL::getRenderImage(CellularPotts* model, ActivityContraint* a
 	// fresh every frame from 1..getCellCount().
 	int cellCount = model->getCellCount();
 	std::vector<cl_int> kindOfCell(cellCount + 1, 0);
+	std::vector<cl_int> stateOfCell(cellCount + 1, 0);
 	for (int id = 1; id <= cellCount; id++)
 	{
 		kindOfCell[id] = model->getCellKind(id);
+		stateOfCell[id] = model->getCellState(id);
 	}
 
 	cl::Buffer memBuf(context, 0, model->grid.size.first * model->grid.size.second * bytePerPixel * sizeof(unsigned char));
@@ -95,13 +97,17 @@ unsigned char* OpenCL::getRenderImage(CellularPotts* model, ActivityContraint* a
 	cl::Buffer kindBuf(context, 0, kindOfCell.size() * sizeof(cl_int));
 	queue.enqueueWriteBuffer(kindBuf, true, 0, kindOfCell.size() * sizeof(cl_int), kindOfCell.data());
 
+	cl::Buffer stateBuf(context, 0, stateOfCell.size() * sizeof(cl_int));
+	queue.enqueueWriteBuffer(stateBuf, true, 0, stateOfCell.size() * sizeof(cl_int), stateOfCell.data());
+
 	cl::Kernel kernel(program, "calculate", &err);
 	kernel.setArg(0, memBuf);
 	kernel.setArg(1, memBuf2);
 	kernel.setArg(2, kindBuf);
-	kernel.setArg(3, sizeX);
-	kernel.setArg(4, sizeY);
-	kernel.setArg(5, y_bits);
+	kernel.setArg(3, stateBuf);
+	kernel.setArg(4, sizeX);
+	kernel.setArg(5, sizeY);
+	kernel.setArg(6, y_bits);
 
 
 	auto maxBlockNumber = device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();

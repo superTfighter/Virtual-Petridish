@@ -11,6 +11,16 @@ writeup, presentation, and university paperwork (background material, not
 a source of technical truth). README.md is in Hungarian; source code
 comments/identifiers are in English.
 
+## Project backlog
+`feature_list.txt` (repo root) is the user's running backlog — a flat
+`[ ]`/`[x]` checklist they keep extending by hand, with a one-line legend
+at the top. When asked to "continue the feature set" or similar, pick up
+the next unchecked item there. Feel free to reorder/split items into
+smaller subtasks yourself when that makes implementation easier (already
+established with the user) — don't just track status passively. Mark an
+item `[x]` with a short `-- done: ...` note summarizing what was actually
+built and how it was verified, not just that it compiles.
+
 ## Tech stack
 - C++ / Win32 / Direct3D 11 (rendering + swapchain)
 - OpenCL (GPU-parallel simulation rendering — see `CPM/kernel.cl`,
@@ -28,30 +38,43 @@ source files, and wired up via hard-coded paths in `CPM.vcxproj`
 (`$(ProjectDir)include`, `$(ProjectDir)lib`).
 
 ## Build / run
-- Build system is a Visual Studio 2019 solution: `CPM.sln`
-  (`PlatformToolset v142`). There is no CMake/Makefile for this project
-  (the `.cmake` files under `CPM/lib/cmake/SFML/` are vendored SFML
-  package-config files, unrelated to building this app).
-- Build the `CPM` project for **`Release|x64` or `Debug|x64`** — the x64
+Two parallel build systems are kept in sync (same source files, same
+`.cpp`/`.h` set — any added/removed/renamed file needs updating in both):
+
+- **Windows**: Visual Studio 2019 solution `CPM.sln` (`PlatformToolset v142`).
+  Build the `CPM` project for **`Release|x64` or `Debug|x64`** — the x64
   configs have `AdditionalIncludeDirectories`/`AdditionalLibraryDirectories`
   /`AdditionalDependencies` wired up; the **Win32 configs do not** and will
-  likely fail to link against OpenCL/D3D11.
-- Command line (from a VS Developer Command Prompt):
-  `msbuild CPM.sln /p:Configuration=Release /p:Platform=x64`
-- Run: `x64/Debug/CPM.exe` or `x64/Release/CPM.exe` (both are already built
-  and committed). Requires Windows, a GPU/driver with a working OpenCL
-  runtime, and Direct3D 11 support. Does not run on Linux without
-  Wine/emulation, and cannot be built or launched from this workspace's
-  typical Linux Claude Code environment — verify changes by careful code
-  review, and note when something needs a Windows build to confirm.
+  likely fail to link against OpenCL/D3D11. Command line (from a VS
+  Developer Command Prompt): `msbuild CPM.sln /p:Configuration=Release /p:Platform=x64`.
+  Run: `x64/Debug/CPM.exe` or `x64/Release/CPM.exe`.
+- **Linux**: a root-level `CMakeLists.txt` builds the same sources against
+  GLFW + OpenGL3 instead of Win32 + D3D11 (selected via `#ifdef _WIN32` in
+  `main.cpp`/`Display.h`/`Display.cpp`/`CellularPotts.h` for the handful of
+  genuinely platform-specific pieces — window/context setup, the ImGui
+  backend, texture upload). Build: `cmake -S . -B build && cmake --build build -j`
+  (or `-DCMAKE_BUILD_TYPE=Release`; VS Code's CMake Tools extension also
+  works via its variant picker). Run: `./build/CPM`. Requires
+  `libglfw3-dev`, OpenGL dev headers, and a working OpenCL runtime+dev
+  package (`ocl-icd-opencl-dev` + a vendor ICD like `intel-opencl-icd`) —
+  this workspace's Linux environment has all of that installed and the app
+  builds/runs here natively; it is **not** Windows-only or Wine-dependent
+  anymore.
 
 ## Testing, linting, CI
 - **No test framework, no CI config, no linter/formatter config exist.**
-  The only "test" is `Simulation::testFunction()`, a debug stub that just
-  prints `" DONE"` — not a real test.
-- There is no automated way to verify changes in this repo. Treat manual
-  review (and, when possible, an actual Windows build) as the only
-  verification available.
+  The only formal "test" is `Simulation::testFunction()`, a debug stub
+  that just prints `" DONE"` — not a real test.
+- Verification in practice: build both configurations when touching
+  shared logic, run the app interactively, and — for changes to
+  `CellularPotts`/`Simulation`/constraint classes — compile a small
+  throwaway `main()` against the relevant `.cpp` files (outside the repo,
+  e.g. in a scratch dir) that constructs a `Simulation`, runs a scenario
+  headlessly for a bit, and asserts on `getCellCount()`/`getCellVolume()`/
+  `getImageData()` etc. This has repeatedly caught real bugs (a
+  self-deadlock, a crash-on-cell-death, incorrect physics) that a build-only
+  check would have missed. No such throwaway harness is checked into the
+  repo — write and discard one per verification pass.
 
 ## Code organization
 - All application source lives flat in one directory, `CPM/`, organized by
@@ -65,9 +88,13 @@ source files, and wired up via hard-coded paths in `CPM.vcxproj`
   pluggable energy terms, with concrete subclasses `AdhesionConstraint`,
   `VolumeConstraint`, `PerimeterConstraint`, `ActivityContraint` (sic),
   `PersistenceConstraint` (incomplete — see the `TODO` in `main.cpp`).
-- `Simulation::setupSimulation(int)` hard-codes 7 demo scenarios (cases
-  0–6, selected via the ImGui `ExampleChooser` in `Display`) — there is no
-  config file or CLI-arg based scenario selection.
+- `Simulation::setupSimulation(int)` hard-codes demo scenarios (an
+  if/else-if chain on an integer, selected via the ImGui `ExampleChooser`
+  in `Display`, indices must match `Display.cpp`'s `items[]` list 1:1) —
+  there is no config file or CLI-arg based scenario selection. The list has
+  grown past the original 7 (bug fixes/new scenarios/a Sandbox mode were
+  added later) — check `Simulation.cpp` and `Display.cpp`'s `items[]` for
+  the current exact count and mapping rather than assuming a fixed number.
 - `OpenCL::getRenderImage()` runs the `calculate`/`border` kernels in
   `CPM/kernel.cl` to produce an RGBA buffer, uploaded each frame as a D3D11
   texture in `Display`/`main.cpp` and explicitly `Release()`-d after every
