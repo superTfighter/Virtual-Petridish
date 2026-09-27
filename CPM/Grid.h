@@ -30,6 +30,14 @@ public:
 	std::vector<float> _resourceArray;
 	float resourceAt(int index);
 	void consumeResourceAt(int index, float amount);
+	// Boosts a pixel's resource (e.g. sandbox "place resource"), clamped at
+	// `cap` so hotspots stay visibly above baseline rather than accumulating
+	// unbounded. No executing/canExecute gating (unlike CellularPotts::
+	// addCellAt): _resourceArray never reallocates after construction, so a
+	// single-element write here is the same already-accepted risk class as
+	// consumeResourceAt(), which EatingConstraint already calls unguarded
+	// from the sim thread.
+	void addResourceAt(int index, float amount, float cap = INITIAL_RESOURCE * 3.0f);
 
 	int x_step;
 	int x_bits;

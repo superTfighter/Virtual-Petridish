@@ -151,6 +151,14 @@ void Grid::consumeResourceAt(int index, float amount)
 	this->_resourceArray[index] = std::max(0.0f, this->_resourceArray[index] - amount);
 }
 
+void Grid::addResourceAt(int index, float amount, float cap)
+{
+	if (index < 0)
+		return;
+
+	this->_resourceArray[index] = std::min(cap, this->_resourceArray[index] + amount);
+}
+
 int Grid::laplaciani(int index)
 {
 

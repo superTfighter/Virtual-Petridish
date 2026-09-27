@@ -123,5 +123,12 @@ public:
 	int NUM_STATES = 1;
 	int stateIndex(int kind, int state) const { return kind * NUM_STATES + state; }
 
+	// GRADIENT-FOLLOWING PARAMETERS -- runtime-mutable toggles (default
+	// off), same post-construction convention as CONSUMPTION_RATE/
+	// PREDATOR_OF above. SEEK_RESOURCES enables ResourceSeekingConstraint
+	// for every real kind; hunting (ChemotaxisConstraint) reuses the
+	// existing PREDATOR_OF field rather than adding a new one.
+	bool SEEK_RESOURCES = false;
+
 };
 

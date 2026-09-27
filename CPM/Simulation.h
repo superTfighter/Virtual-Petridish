@@ -8,6 +8,8 @@
 #include "ActivityContraint.h"
 #include "EatingConstraint.h"
 #include "PredationConstraint.h"
+#include "ResourceSeekingConstraint.h"
+#include "ChemotaxisConstraint.h"
 #include "PixelsByCell.h"
 #include <thread>
 #include "OpenCL.h"
@@ -40,6 +42,8 @@ public:
 	ActivityContraint activity;
 	EatingConstraint eating;
 	PredationConstraint predation;
+	ResourceSeekingConstraint resourceSeeking;
+	ChemotaxisConstraint chemotaxis;
 
 	bool simulationRunning;
 

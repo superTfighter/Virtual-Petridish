@@ -26,6 +26,7 @@ add_executable(CPM
     ${CPM_DIR}/AdhesionConstraint.cpp
     ${CPM_DIR}/Cell.cpp
     ${CPM_DIR}/CellularPotts.cpp
+    ${CPM_DIR}/ChemotaxisConstraint.cpp
     ${CPM_DIR}/DiceSet.cpp
     ${CPM_DIR}/Display.cpp
     ${CPM_DIR}/DisplayHelper.cpp
@@ -47,6 +48,7 @@ add_executable(CPM
     ${CPM_DIR}/PersistenceConstraint.cpp
     ${CPM_DIR}/PredationConstraint.cpp
     ${CPM_DIR}/PixelsByCell.cpp
+    ${CPM_DIR}/ResourceSeekingConstraint.cpp
     ${CPM_DIR}/Simulation.cpp
     ${CPM_DIR}/Statistics.cpp
     ${CPM_DIR}/VolumeConstraint.cpp

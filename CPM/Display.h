@@ -44,6 +44,25 @@ private:
 	bool showExampleChooser;
 	bool sandboxMode;
 	int selectedKind;
+
+	// Sandbox placement mode: 0 = place a cell of selectedKind, 1 = place a
+	// resource hotspot. Consulted by showProject()'s click handler.
+	int placeMode;
+
+	// Sandbox "hunting" controls: hunterKind/preyKind are 0-based combo
+	// indices (kind = index+1); mirror Parameters::PREDATOR_OF at runtime
+	// (Enable Hunting sets p.PREDATOR_OF[hunterKind+1]=preyKind+1, disable
+	// clears it) without needing to reset the grid.
+	int hunterKind;
+	int preyKind;
+	bool huntEnabled;
+	bool seekResourcesEnabled;
+
+	// Simulation image zoom/pan. panOffset is the top-left corner (in 0..1
+	// texture UV space) of the visible 1/zoomLevel-sized sub-rectangle.
+	float zoomLevel;
+	ImVec2 panOffset;
+
 	void ExampleChooser();
 	void showProject(int projectNumber);
 	void showParameters();

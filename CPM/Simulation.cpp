@@ -423,10 +423,21 @@ void Simulation::setupSimulation(int number)
 
 		p = Parameters(3, { {0,20,20,20},{20,50,20,20},{20,20,50,20},{20,20,20,50} }, 20.0f,
 		               { 0,5,5,5 }, { 0,500,500,500 }, { 0,0,0,0 }, { 0,0,0,0 });
+		p.CONSUMPTION_RATE = { 0,2,2,2 };
+		// SEEK_RESOURCES and PREDATOR_OF default off/empty -- eating,
+		// resourceSeeking, predation and chemotaxis are registered
+		// unconditionally below so the sandbox UI can toggle them live
+		// (via Display's Hunt/Seek Resources checkboxes) without needing
+		// to reset the grid, since they're all runtime-gated no-ops until
+		// enabled.
 		model = CellularPotts(std::pair<int, int>(500, 500), &p);
 
 		model.addConstraint(&adhesion);
 		model.addConstraint(&volume);
+		model.addConstraint(&eating);
+		model.addConstraint(&resourceSeeking);
+		model.addConstraint(&predation);
+		model.addConstraint(&chemotaxis);
 
 		model.cellDivision = false;
 	}

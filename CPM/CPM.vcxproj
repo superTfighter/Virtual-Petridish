@@ -153,6 +153,7 @@
     <ClCompile Include="AdhesionConstraint.cpp" />
     <ClCompile Include="Cell.cpp" />
     <ClCompile Include="CellularPotts.cpp" />
+    <ClCompile Include="ChemotaxisConstraint.cpp" />
     <ClCompile Include="DiceSet.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="DisplayHelper.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="PersistenceConstraint.cpp" />
     <ClCompile Include="PredationConstraint.cpp" />
     <ClCompile Include="PixelsByCell.cpp" />
+    <ClCompile Include="ResourceSeekingConstraint.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Statistics.cpp" />
     <ClCompile Include="VolumeConstraint.cpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="AdhesionConstraint.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="CellularPotts.h" />
+    <ClInclude Include="ChemotaxisConstraint.h" />
     <ClInclude Include="DiceSet.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="DisplayHelper.h" />
@@ -204,6 +207,7 @@
     <ClInclude Include="PersistenceConstraint.h" />
     <ClInclude Include="PredationConstraint.h" />
     <ClInclude Include="PixelsByCell.h" />
+    <ClInclude Include="ResourceSeekingConstraint.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Statistics.h" />
     <ClInclude Include="stb_image.h" />

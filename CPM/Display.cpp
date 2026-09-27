@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include <utility>
+#include <cmath>
 
 // Standard ImGui "(?)" hover-tooltip idiom, used throughout showParameters()
 // so a control's purpose is visible without needing to guess from its label.
@@ -30,6 +31,13 @@ Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
 	showExampleChooser = true;
 	sandboxMode = false;
 	selectedKind = 1;
+	placeMode = 0;
+	hunterKind = 0; // 0-based combo index -> "Kind 1"
+	preyKind = 1;   // 0-based combo index -> "Kind 2"
+	huntEnabled = false;
+	seekResourcesEnabled = false;
+	zoomLevel = 1.0f;
+	panOffset = ImVec2(0.0f, 0.0f);
 }
 #else
 Display::Display(Simulation* simulation)
@@ -39,6 +47,13 @@ Display::Display(Simulation* simulation)
 	showExampleChooser = true;
 	sandboxMode = false;
 	selectedKind = 1;
+	placeMode = 0;
+	hunterKind = 0; // 0-based combo index -> "Kind 1"
+	preyKind = 1;   // 0-based combo index -> "Kind 2"
+	huntEnabled = false;
+	seekResourcesEnabled = false;
+	zoomLevel = 1.0f;
+	panOffset = ImVec2(0.0f, 0.0f);
 }
 #endif
 
@@ -128,47 +143,115 @@ void Display::showProject(int projectNumber)
 	bool open = true;
 
 	ImGui::Begin("Simulation", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
+	// GetContentRegionAvail() (not a window-size-derived guess) correctly
+	// excludes the title bar/padding ImGui itself reserves, so the image
+	// never overflows its own window -- the old hardcoded formula caused a
+	// guaranteed scrollbar on every single frame regardless of content.
+	ImVec2 dispSize = ImGui::GetContentRegionAvail();
+
+	float visibleFrac = 1.0f / zoomLevel;
+	ImVec2 uv0 = panOffset;
+	ImVec2 uv1 = ImVec2(panOffset.x + visibleFrac, panOffset.y + visibleFrac);
+
 #ifdef _WIN32
-	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
+	ImGui::Image((void*)my_texture, dispSize, uv0, uv1);
 #else
-	ImGui::Image((void*)(intptr_t)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
+	ImGui::Image((void*)(intptr_t)my_texture, dispSize, uv0, uv1);
 #endif
 
-	if (sandboxMode && ImGui::IsItemHovered() && ImGui::IsItemClicked(ImGuiMouseButton_Left))
+	bool hovered = ImGui::IsItemHovered();
+	ImVec2 itemMin = ImGui::GetItemRectMin();
+	ImVec2 mousePos = ImGui::GetMousePos();
+	float local_x = mousePos.x - itemMin.x;
+	float local_y = mousePos.y - itemMin.y;
+
+	// Scroll-wheel zoom, centered on the cursor (keeps the grid point under
+	// the cursor fixed across the zoom change).
+	if (hovered && ImGui::GetIO().MouseWheel != 0.0f && dispSize.x > 0 && dispSize.y > 0)
 	{
-		ImVec2 itemMin = ImGui::GetItemRectMin();
-		ImVec2 mousePos = ImGui::GetMousePos();
+		float cursorU = panOffset.x + (local_x / dispSize.x) * visibleFrac;
+		float cursorV = panOffset.y + (local_y / dispSize.y) * visibleFrac;
 
-		float local_x = mousePos.x - itemMin.x;
-		float local_y = mousePos.y - itemMin.y;
+		zoomLevel *= (1.0f + ImGui::GetIO().MouseWheel * 0.1f);
+		zoomLevel = std::max(1.0f, std::min(zoomLevel, 8.0f));
 
-		float W_disp = (width - (width * 0.3f)) - 100;
-		float H_disp = (height - (height * 0.2f));
+		float newFrac = 1.0f / zoomLevel;
+		panOffset.x = cursorU - (local_x / dispSize.x) * newFrac;
+		panOffset.y = cursorV - (local_y / dispSize.y) * newFrac;
 
-		if (local_x >= 0 && local_x < W_disp && local_y >= 0 && local_y < H_disp)
+		panOffset.x = std::max(0.0f, std::min(panOffset.x, 1.0f - newFrac));
+		panOffset.y = std::max(0.0f, std::min(panOffset.y, 1.0f - newFrac));
+	}
+
+	// Right-drag pan (left-click is already used for sandbox placement).
+	if (hovered && ImGui::IsMouseDragging(ImGuiMouseButton_Right) && dispSize.x > 0 && dispSize.y > 0)
+	{
+		ImVec2 delta = ImGui::GetIO().MouseDelta;
+		float frac = 1.0f / zoomLevel;
+
+		panOffset.x -= (delta.x / dispSize.x) * frac;
+		panOffset.y -= (delta.y / dispSize.y) * frac;
+
+		panOffset.x = std::max(0.0f, std::min(panOffset.x, 1.0f - frac));
+		panOffset.y = std::max(0.0f, std::min(panOffset.y, 1.0f - frac));
+	}
+
+	if (sandboxMode && hovered && ImGui::IsItemClicked(ImGuiMouseButton_Left)
+	    && local_x >= 0 && local_x < dispSize.x && local_y >= 0 && local_y < dispSize.y)
+	{
+		// Map through the current zoom/pan sub-rectangle before the existing
+		// transposed screen->grid conversion below.
+		float u = panOffset.x + (local_x / dispSize.x) * visibleFrac;
+		float v = panOffset.y + (local_y / dispSize.y) * visibleFrac;
+
+		// The render buffer is packed x-major/y-minor, so screen-horizontal
+		// maps to grid-y and screen-vertical maps to grid-x (transposed
+		// from naive expectation -- see Grid::pointToIndex).
+		int grid_y = (int)(u * this->simulation->model.grid.size.second);
+		int grid_x = (int)(v * this->simulation->model.grid.size.first);
+
+		grid_x = std::max(0, std::min(grid_x, this->simulation->model.grid.size.first - 1));
+		grid_y = std::max(0, std::min(grid_y, this->simulation->model.grid.size.second - 1));
+
+		if (placeMode == 0)
 		{
-			float u = local_x / W_disp;
-			float v = local_y / H_disp;
-
-			// The render buffer is packed x-major/y-minor, so screen-horizontal
-			// maps to grid-y and screen-vertical maps to grid-x (transposed
-			// from naive expectation -- see Grid::pointToIndex).
-			int grid_y = (int)(u * this->simulation->model.grid.size.second);
-			int grid_x = (int)(v * this->simulation->model.grid.size.first);
-
-			grid_x = std::max(0, std::min(grid_x, this->simulation->model.grid.size.first - 1));
-			grid_y = std::max(0, std::min(grid_y, this->simulation->model.grid.size.second - 1));
-
 			this->simulation->model.addCellAt(std::pair<int, int>(grid_x, grid_y), this->selectedKind);
+		}
+		else
+		{
+			// A single boosted pixel has no usable gradient beyond its
+			// immediate neighbor -- ResourceSeekingConstraint's bias would
+			// vanish a few pixels out, the same "gradient too localized"
+			// problem ChemotaxisConstraint's scent field had. Lay down a
+			// radial blob instead (linear falloff to 0 at the edge) so
+			// there's a real gradient to climb from a real distance away.
+			auto& grid = this->simulation->model.grid;
+			const int radius = 40;
+			const float peakAmount = Grid::INITIAL_RESOURCE * 2.0f;
+
+			for (int dx = -radius; dx <= radius; dx++)
+			{
+				for (int dy = -radius; dy <= radius; dy++)
+				{
+					float dist = std::sqrt((float)(dx * dx + dy * dy));
+					if (dist > radius)
+						continue;
+
+					int px = grid_x + dx;
+					int py = grid_y + dy;
+					if (px < 0 || px >= grid.size.first || py < 0 || py >= grid.size.second)
+						continue;
+
+					float amount = peakAmount * (1.0f - dist / radius);
+					int idx = grid.pointToIndex(std::pair<int, int>(px, py));
+					grid.addResourceAt(idx, amount);
+				}
+			}
 		}
 	}
 
-	//ImGui::Image((void*)my_texture, ImVec2(my_image_width, my_image_height));
 	ImGui::End();
-
-
-	 //my_texture = NULL;
-	 //delete my_texture;
 }
 
 void Display::showParameters()
@@ -208,34 +291,68 @@ void Display::showParameters()
 	{
 		ImGui::Text("Sandbox Controls");
 
-		ImGui::RadioButton("Kind 1", &this->selectedKind, 1); ImGui::SameLine();
-		ImGui::RadioButton("Kind 2", &this->selectedKind, 2); ImGui::SameLine();
-		ImGui::RadioButton("Kind 3", &this->selectedKind, 3);
+		ImGui::RadioButton("Place Cell", &this->placeMode, 0); ImGui::SameLine();
+		ImGui::RadioButton("Place Resource", &this->placeMode, 1);
+		HelpMarker("Click the Simulation image to place. Cell mode places selectedKind's cell; Resource mode boosts that pixel's nutrient level above baseline (see Kind/Hunt seeking below to make cells actually want it).");
 
-		if (ImGui::Button("Add Random Cell"))
+		if (this->placeMode == 0)
 		{
-			int max_attempts = 1000;
-			auto& grid = this->simulation->model.grid;
+			ImGui::RadioButton("Kind 1", &this->selectedKind, 1); ImGui::SameLine();
+			ImGui::RadioButton("Kind 2", &this->selectedKind, 2); ImGui::SameLine();
+			ImGui::RadioButton("Kind 3", &this->selectedKind, 3);
 
-			for (int attempt = 0; attempt < max_attempts; attempt++)
+			if (ImGui::Button("Add Random Cell"))
 			{
-				std::pair<int, int> point(rand() % grid.size.first, rand() % grid.size.second);
+				int max_attempts = 1000;
+				auto& grid = this->simulation->model.grid;
 
-				if (grid.pixti(grid.pointToIndex(point)) == 0)
+				for (int attempt = 0; attempt < max_attempts; attempt++)
 				{
-					this->simulation->model.addCellAt(point, this->selectedKind);
-					break;
+					std::pair<int, int> point(rand() % grid.size.first, rand() % grid.size.second);
+
+					if (grid.pixti(grid.pointToIndex(point)) == 0)
+					{
+						this->simulation->model.addCellAt(point, this->selectedKind);
+						break;
+					}
 				}
 			}
+		}
+
+		ImGui::Checkbox("Seek Resources", &this->seekResourcesEnabled);
+		ImGui::SameLine(); HelpMarker("When on, every cell kind is biased to grow/move toward pixels with more nutrient. Resources start uniform, so this has no visible effect until you've placed a hotspot (Place Resource above) or cells have eaten unevenly.");
+		this->simulation->p.SEEK_RESOURCES = this->seekResourcesEnabled;
+
+		ImGui::Checkbox("Enable Hunting", &this->huntEnabled);
+		ImGui::SameLine(); HelpMarker("Makes the hunter kind actively chase and consume the prey kind (real directed movement toward prey, not just winning on contact).");
+		ImGui::SameLine(); ImGui::SetNextItemWidth(80); ImGui::Combo("Hunter", &this->hunterKind, "Kind 1\0Kind 2\0Kind 3\0");
+		ImGui::SameLine(); ImGui::SetNextItemWidth(80); ImGui::Combo("Prey", &this->preyKind, "Kind 1\0Kind 2\0Kind 3\0");
+		// Combo indices are 0-based, kinds are 1-based.
+		int hunterKindValue = this->hunterKind + 1;
+		int preyKindValue = this->preyKind + 1;
+		if (this->huntEnabled && hunterKindValue != preyKindValue)
+		{
+			this->simulation->p.PREDATOR_OF = { 0,0,0,0 };
+			this->simulation->p.PREDATOR_OF[hunterKindValue] = preyKindValue;
+		}
+		else
+		{
+			this->simulation->p.PREDATOR_OF = { 0,0,0,0 };
 		}
 
 		if (ImGui::Button("Clear Sandbox"))
 		{
 			// Resets in place (stays in sandbox view) -- unlike "Restart
 			// Simulation" above, which routes back to the scenario picker.
+			// setupSimulation() rebuilds p from scratch (dropping any
+			// runtime PREDATOR_OF/SEEK_RESOURCES set above), so reset the
+			// UI toggles too to keep them in sync with the fresh state.
 			this->simulation->stopSimulation();
 			this->simulation->setupSimulation(12);
 			this->simulation->runSimulation();
+
+			this->huntEnabled = false;
+			this->seekResourcesEnabled = false;
 		}
 
 		ImGui::Separator();
@@ -384,6 +501,10 @@ void Display::showStatistics()
 
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Cells died: %d", totalCreated - totalAlive);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
 		ImGui::Text("Simulation time: %d", model.simTime);
 
 		ImGui::TableNextRow();
@@ -496,8 +617,12 @@ bool Display::LoadTexture(unsigned int* out_tex, int* out_width, int* out_height
 	GLuint tex;
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// GL_NEAREST (not GL_LINEAR): the source texture is native grid
+	// resolution (as small as 250x250) stretched across a much larger
+	// display area, so linear magnification filtering blurred the image;
+	// nearest gives a crisp per-pixel look appropriate for a cell grid.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
 
 	*out_tex = tex;
