@@ -346,22 +346,27 @@ void CellularPotts::updateBorderNearAri(int index, int old_type, int new_type)
 
 void CellularPotts::updateCellVolumes()
 {
-	auto cp = Statistics(this).PixelsByCell();
+	// Runs every single MCS regardless of scenario, so it must not go
+	// through Statistics::PixelsByCell() -- that builds a full per-cell
+	// list of pixel *coordinates* (a full _pixelArray copy plus an
+	// indexToPoint()+push_back per occupied pixel) just so the count of
+	// entries could be taken and every coordinate immediately discarded.
+	// A direct tally needs none of that: one pass over _pixelArray,
+	// incrementing a per-cell-ID counter. Measured (see feature_list.txt
+	// item 28) to matter a lot at low border-pixel-count/large-grid
+	// scenarios (the full-grid scan dominated the whole step there) and a
+	// little even in border-pixel-heavy scenarios where it's a smaller
+	// share of a step's cost.
+	std::vector<int> counts(this->cellTypeToKind.size(), 0);
 
-	for (size_t i = 1; i < this->cellTypeToKind.size(); i++)
+	for (int cellId : this->grid._pixelArray)
 	{
-		// cp only grows to cover cell IDs that actually appear on the grid,
-		// so a cell with zero pixels currently painted (e.g. a division that
-		// put none of the parent's pixels on this side) has no entry here.
-		int cellvolume = (i < cp.size()) ? cp[i].size() : 0;
-
-		this->cellVolume[i] = cellvolume;
+		if (cellId > 0 && cellId < (int)counts.size())
+			counts[cellId]++;
 	}
 
-
-	
-
-
+	for (size_t i = 1; i < this->cellTypeToKind.size(); i++)
+		this->cellVolume[i] = counts[i];
 }
 
 float CellularPotts::deltaH(int sourceIndex, int targetIndex, int sourceType, int targetType)

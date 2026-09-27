@@ -18,6 +18,7 @@ target_compile_definitions(test_docopy PRIVATE CPM_ENABLE_TEST_HOOKS)
 
 cpm_add_test(test_adhesion)
 cpm_add_test(test_gradient_constraints)
+cpm_add_test(test_cell_volumes)
 
 # test_scenarios and test_render construct a Simulation, which owns an
 # OpenCL member that eagerly loads "kernel.cl" via a cwd-relative ifstream
