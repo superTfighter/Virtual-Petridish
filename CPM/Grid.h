@@ -21,7 +21,13 @@ public:
 	std::pair<int, int> middle;
 
 	std::vector<int> _pixelArray;
-	
+
+	// Nutrient/resource level per grid position (same padded stride as
+	// _pixelArray), consumed by EatingConstraint as cells move over it.
+	std::vector<float> _resourceArray;
+	float resourceAt(int index);
+	void consumeResourceAt(int index, float amount);
+
 	int x_step;
 	int x_bits;
 	int y_bits;

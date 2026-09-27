@@ -29,6 +29,7 @@ add_executable(CPM
     ${CPM_DIR}/DiceSet.cpp
     ${CPM_DIR}/Display.cpp
     ${CPM_DIR}/DisplayHelper.cpp
+    ${CPM_DIR}/EatingConstraint.cpp
     ${CPM_DIR}/Grid.cpp
     ${CPM_DIR}/GridManadger.cpp
     ${CPM_DIR}/HamiltonianConstraint.cpp
@@ -44,6 +45,7 @@ add_executable(CPM
     ${CPM_DIR}/Parameters.cpp
     ${CPM_DIR}/PerimeterConstraint.cpp
     ${CPM_DIR}/PersistenceConstraint.cpp
+    ${CPM_DIR}/PredationConstraint.cpp
     ${CPM_DIR}/PixelsByCell.cpp
     ${CPM_DIR}/Simulation.cpp
     ${CPM_DIR}/Statistics.cpp

@@ -6,6 +6,8 @@
 #include "VolumeConstraint.h"
 #include "PerimeterConstraint.h"
 #include "ActivityContraint.h"
+#include "EatingConstraint.h"
+#include "PredationConstraint.h"
 #include "PixelsByCell.h"
 #include <thread>
 #include "OpenCL.h"
@@ -36,6 +38,8 @@ public:
 	VolumeConstraint volume;
 	PerimeterConstraint peremiter;
 	ActivityContraint activity;
+	EatingConstraint eating;
+	PredationConstraint predation;
 
 	bool simulationRunning;
 

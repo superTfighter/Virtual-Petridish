@@ -1,4 +1,5 @@
 #include "Grid.h"
+#include <algorithm>
 
 Grid::Grid(int xSize, int ySize)
 {
@@ -13,6 +14,9 @@ Grid::Grid(int xSize, int ySize)
 	this->y_mask = this->x_step - 1;
 
 	_pixelArray.resize(pointToIndex(size));
+
+	_resourceArray.resize(_pixelArray.size());
+	std::fill(_resourceArray.begin(), _resourceArray.end(), 100.0f);
 
 	this->middle = std::pair<int,int>(xSize / 2, ySize / 2);
 
@@ -125,6 +129,22 @@ int Grid::pixti(int src_i)
 void Grid::setpixi(int index, int type)
 {
 	this->_pixelArray[index] = type;
+}
+
+float Grid::resourceAt(int index)
+{
+	if (index < 0)
+		return 0.0f;
+
+	return this->_resourceArray[index];
+}
+
+void Grid::consumeResourceAt(int index, float amount)
+{
+	if (index < 0)
+		return;
+
+	this->_resourceArray[index] = std::max(0.0f, this->_resourceArray[index] - amount);
 }
 
 int Grid::laplaciani(int index)

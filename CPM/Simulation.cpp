@@ -278,7 +278,103 @@ void Simulation::setupSimulation(int number)
 		model.cellDivision = true;
 
 	}
-	else if (number == 9) { //SANDBOX
+	else if (number == 9) { //NUTRIENT FORAGING
+
+		srand(time(NULL));
+
+		p = Parameters(1, { {0,20},{20,100} }, 20.0f, { 0,10 }, { 0,300 }, { 0,0 }, { 0,0 });
+		p.CONSUMPTION_RATE = { 0,5 };
+
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		int numCells = 10;
+		int max_attempts = 1000;
+
+		for (int i = 0; i < numCells; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(1));
+					break;
+				}
+			}
+		}
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+		model.addConstraint(&eating);
+	}
+	else if (number == 10) { //PREDATION
+
+		srand(time(NULL));
+
+		// kind 1 = predator, kind 2 = prey. Baseline adhesion is mild/symmetric;
+		// PredationConstraint is what actually drives predator-into-prey
+		// invasion once they're in contact (see PredationConstraint::deltaH).
+		// Predators also get ActivityContraint migration (prey doesn't -- its
+		// LAMBDA_ACT/MAX_ACT are 0) so they actively hunt instead of relying
+		// on growth radius alone to ever reach a prey cell. Predator volume
+		// target (5000) is well above what they can realistically reach given
+		// the grid/region size, so they stay hungry and keep hunting for a
+		// long time rather than satiating early and going passive -- but it's
+		// bounded (unlike an unreachable target), so they don't instantly
+		// consume the entire grid the moment the scenario starts.
+		p = Parameters(2, { {0,20,20},{20,100,20},{20,20,100} }, 20.0f,
+		               { 0,15,10 }, { 0,5000,150 }, { 0,0,0 }, { 0,0,0 },
+		               "geometric", { 0,60,0 }, { 0,60,0 });
+		p.PREDATOR_OF = { 0,2,0 }; // kind 1 preys on kind 2, kind 2 preys on nothing
+
+		model = CellularPotts(std::pair<int, int>(300, 300), &p);
+
+		int numPredators = 8;
+		int numPrey = 30;
+		int max_attempts = 1000;
+
+		// Both kinds are seeded into the same central region (not scattered
+		// across the whole grid) so predators and prey actually end up close
+		// enough to meet -- otherwise growth+migration alone rarely brings a
+		// sparse, randomly-scattered predator into contact with any prey
+		// within a reasonable time.
+		int regionMin = 90, regionMax = 210;
+
+		for (int i = 0; i < numPredators; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(regionMin + rand() % (regionMax - regionMin), regionMin + rand() % (regionMax - regionMin));
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(1));
+					break;
+				}
+			}
+		}
+
+		for (int i = 0; i < numPrey; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(regionMin + rand() % (regionMax - regionMin), regionMin + rand() % (regionMax - regionMin));
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					model.setPixel(point, model.makeNewCellID(2));
+					break;
+				}
+			}
+		}
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+		model.addConstraint(&predation);
+		model.addConstraint(&activity);
+	}
+	else if (number == 11) { //SANDBOX
 
 		srand(time(NULL));
 

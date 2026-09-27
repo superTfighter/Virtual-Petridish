@@ -98,5 +98,17 @@ public:
 	std::vector<float> LAMDA_DIR;
 	std::vector<float> PERSIST;
 
+	// EATING/RESOURCE PARAMETERS -- per-cell-kind resource consumption rate.
+	// Not part of any constructor (default-constructs empty like the other
+	// arrays would if omitted); scenarios that use EatingConstraint set it
+	// directly after construction, the same way Simulation::setupSimulation
+	// sets model.cellDivision post-construction.
+	std::vector<float> CONSUMPTION_RATE;
+
+	// PREDATION PARAMETERS -- PREDATOR_OF[kind] = the kind this kind preys
+	// on (0 = none / not a predator). Same post-construction-assignment
+	// convention as CONSUMPTION_RATE above.
+	std::vector<int> PREDATOR_OF;
+
 };
 

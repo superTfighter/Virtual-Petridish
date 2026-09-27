@@ -42,10 +42,16 @@
     <ClCompile Include="ActivityContraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="EatingConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="VolumeConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PersistenceConstraint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PredationConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PerimeterConstraint.cpp">
@@ -119,10 +125,16 @@
     <ClInclude Include="ActivityContraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EatingConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="VolumeConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PersistenceConstraint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PredationConstraint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PerimeterConstraint.h">

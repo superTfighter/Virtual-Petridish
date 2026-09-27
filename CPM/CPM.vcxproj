@@ -156,6 +156,7 @@
     <ClCompile Include="DiceSet.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="DisplayHelper.cpp" />
+    <ClCompile Include="EatingConstraint.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="GridManadger.cpp" />
     <ClCompile Include="HamiltonianConstraint.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Parameters.cpp" />
     <ClCompile Include="PerimeterConstraint.cpp" />
     <ClCompile Include="PersistenceConstraint.cpp" />
+    <ClCompile Include="PredationConstraint.cpp" />
     <ClCompile Include="PixelsByCell.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Statistics.cpp" />
@@ -184,6 +186,7 @@
     <ClInclude Include="DiceSet.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="DisplayHelper.h" />
+    <ClInclude Include="EatingConstraint.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="GridManadger.h" />
     <ClInclude Include="HamiltonianConstraint.h" />
@@ -199,6 +202,7 @@
     <ClInclude Include="Parameters.h" />
     <ClInclude Include="PerimeterConstraint.h" />
     <ClInclude Include="PersistenceConstraint.h" />
+    <ClInclude Include="PredationConstraint.h" />
     <ClInclude Include="PixelsByCell.h" />
     <ClInclude Include="Simulation.h" />
     <ClInclude Include="Statistics.h" />
