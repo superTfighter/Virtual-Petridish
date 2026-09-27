@@ -30,6 +30,7 @@ CellularPotts::CellularPotts(const CellularPotts& other) :
 	last_cell_id(other.last_cell_id),
 	cellVolume(other.cellVolume),
 	cellTypeToKind(other.cellTypeToKind),
+	cellTypeToState(other.cellTypeToState),
 	_neighbours(other._neighbours),
 	contraints(other.contraints),
 	makingANewCellID(other.makingANewCellID.load()),
@@ -58,6 +59,7 @@ CellularPotts& CellularPotts::operator=(const CellularPotts& other)
 	last_cell_id = other.last_cell_id;
 	cellVolume = other.cellVolume;
 	cellTypeToKind = other.cellTypeToKind;
+	cellTypeToState = other.cellTypeToState;
 	_neighbours = other._neighbours;
 	contraints = other.contraints;
 	makingANewCellID = other.makingANewCellID.load();
@@ -90,6 +92,9 @@ void CellularPotts::init(std::pair<int, int> gridSize, Parameters* parameters)
 
 	this->cellTypeToKind = std::vector<int>();
 	cellTypeToKind.resize(1);
+
+	this->cellTypeToState = std::vector<int>();
+	cellTypeToState.resize(1);
 
 	this->_neighbours = std::vector<int>();
 	_neighbours.resize(gridSize.first * gridSize.second * 8);
@@ -244,6 +249,7 @@ int CellularPotts::makeNewCellID(int kind)
 		}
 
 		this->setCellKind(newID, kind);
+		this->setCellState(newID, 0);
 		cells.push_back(Cell(this, kind, newID));
 
 		makingANewCellID = false;
@@ -279,6 +285,24 @@ void CellularPotts::setCellKind(int typeID, int kind)
 int CellularPotts::getCellKind(int typeID)
 {
 	return this->cellTypeToKind[typeID];
+}
+
+void CellularPotts::setCellState(int typeID, int state)
+{
+
+	try {
+		cellTypeToState.insert(cellTypeToState.begin() + typeID, state);
+	}
+	catch (std::out_of_range& err) {
+
+		cellTypeToState.resize(cellTypeToState.size() * 2);
+		cellTypeToState.insert(cellTypeToState.begin() + typeID, state);
+	}
+}
+
+int CellularPotts::getCellState(int typeID)
+{
+	return this->cellTypeToState[typeID];
 }
 
 void CellularPotts::updateBorderNearAri(int index, int old_type, int new_type)

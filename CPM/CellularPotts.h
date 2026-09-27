@@ -46,6 +46,13 @@ public:
 	void setCellKind(int typeID, int kind);
 	int getCellKind(int typeID);
 
+	// A cell's substate (default 0 -- "base"), independent of its kind.
+	// Parameters::stateIndex(kind, state) combines the two into a single
+	// flat index for constraints that want per-(kind,state) parameter
+	// arrays instead of per-kind ones.
+	void setCellState(int typeID, int state);
+	int getCellState(int typeID);
+
 	void updateBorderNearAri(int index, int old_type, int new_type);
 
 	void setPixelI(int cellId, int sourceType);
@@ -92,6 +99,7 @@ private:
 
 	std::vector<int> cellVolume;
 	std::vector<int> cellTypeToKind;
+	std::vector<int> cellTypeToState;
 	std::vector<int> _neighbours;
 
 	std::vector<HamiltonianConstraint*> contraints;

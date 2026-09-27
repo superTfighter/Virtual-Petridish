@@ -75,14 +75,14 @@ void Display::ExampleChooser()
 
 	ImGui::Separator();
 
-	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Wound healing", "Perimeter Demo", "Adhesion + Migration", "Cell Division", "Nutrient Foraging", "Predation", "Sandbox" };
+	const char* items[] = { "Simple Cell","Ising Model", "Epithelial Sheet","Cellsorting",  "Multiple Cells", "Wound healing", "Perimeter Demo", "Adhesion + Migration", "Cell Division", "Nutrient Foraging", "Predation", "Substates Demo", "Sandbox" };
 	static int item_current = -1;
 	ImGui::ListBox("Choose your simulation!", &item_current, items, IM_ARRAYSIZE(items), 4);
 
 	if (item_current != -1)
 	{
 		showExampleChooser = false;
-		sandboxMode = (item_current == 11);
+		sandboxMode = (item_current == 12);
 
 		simulation->setupSimulation(item_current);
 
@@ -217,7 +217,7 @@ void Display::showParameters()
 			// Resets in place (stays in sandbox view) -- unlike "Restart
 			// Simulation" above, which routes back to the scenario picker.
 			this->simulation->stopSimulation();
-			this->simulation->setupSimulation(11);
+			this->simulation->setupSimulation(12);
 			this->simulation->runSimulation();
 		}
 

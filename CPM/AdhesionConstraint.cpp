@@ -31,7 +31,10 @@ float AdhesionConstraint::H(int i, int tp)
 
 float AdhesionConstraint::J(int t1, int t2)
 {
-    std::vector<int> J = this->model->parameters->J[this->model->getCellKind(t1)];
+    int idx1 = this->model->parameters->stateIndex(this->model->getCellKind(t1), this->model->getCellState(t1));
+    int idx2 = this->model->parameters->stateIndex(this->model->getCellKind(t2), this->model->getCellState(t2));
 
-    return J[this->model->getCellKind(t2)];
+    std::vector<int> J = this->model->parameters->J[idx1];
+
+    return J[idx2];
 }

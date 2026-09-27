@@ -110,5 +110,18 @@ public:
 	// convention as CONSUMPTION_RATE above.
 	std::vector<int> PREDATOR_OF;
 
+	// SUBSTATE PARAMETERS -- NUM_STATES is how many substates each kind has
+	// (default 1, via the in-class initializer below, so every existing
+	// constructor/scenario gets it "for free" without touching any of
+	// them). stateIndex(kind, state) flattens a (kind, state) pair into a
+	// single index for constraints that want per-(kind,state) parameter
+	// arrays (V, LAMBDA_V, J, ...) instead of per-kind ones: when
+	// NUM_STATES==1, stateIndex(kind, 0) == kind, so every existing
+	// scenario's kind-indexed arrays keep working completely unchanged. A
+	// scenario that wants real substates sets NUM_STATES>1 and sizes its
+	// arrays to numKinds*NUM_STATES entries, addressed via stateIndex.
+	int NUM_STATES = 1;
+	int stateIndex(int kind, int state) const { return kind * NUM_STATES + state; }
+
 };
 

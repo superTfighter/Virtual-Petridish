@@ -374,7 +374,50 @@ void Simulation::setupSimulation(int number)
 		model.addConstraint(&predation);
 		model.addConstraint(&activity);
 	}
-	else if (number == 11) { //SANDBOX
+	else if (number == 11) { //SUBSTATES DEMO
+
+		srand(time(NULL));
+
+		// A single kind (1) with 2 substates that behave like different
+		// kinds via Parameters::stateIndex: state 0 = "small" (low volume
+		// target, weak self-adhesion), state 1 = "grown" (much larger
+		// volume target, stronger self-adhesion). Rows/cols 0-1 are unused
+		// placeholders (medium and the never-occurring kind0/state1 slot);
+		// real cells only ever use indices 2 (kind1,state0) and 3
+		// (kind1,state1).
+		p = Parameters(1, {
+			{0,0,20,20},
+			{0,0,0,0},
+			{20,0,50,30},
+			{20,0,30,50}
+		}, 20.0f, { 0,0,10,10 }, { 0,0,100,600 }, { 0,0,0,0 }, { 0,0,0,0 });
+		p.NUM_STATES = 2;
+
+		model = CellularPotts(std::pair<int, int>(500, 500), &p);
+
+		int numCells = 10;
+		int max_attempts = 1000;
+
+		for (int i = 0; i < numCells; i++)
+		{
+			for (int attempt = 0; attempt < max_attempts; attempt++)
+			{
+				std::pair<int, int> point(rand() % model.grid.size.first, rand() % model.grid.size.second);
+
+				if (model.grid.pixti(model.grid.pointToIndex(point)) == 0)
+				{
+					int id = model.makeNewCellID(1);
+					model.setCellState(id, i % 2); // alternate state 0 / state 1
+					model.setPixel(point, id);
+					break;
+				}
+			}
+		}
+
+		model.addConstraint(&adhesion);
+		model.addConstraint(&volume);
+	}
+	else if (number == 12) { //SANDBOX
 
 		srand(time(NULL));
 
