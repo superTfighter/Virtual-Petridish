@@ -24,6 +24,9 @@ public:
 
 	// Nutrient/resource level per grid position (same padded stride as
 	// _pixelArray), consumed by EatingConstraint as cells move over it.
+	// Named so the renderer can normalize its resource-level tint against
+	// the same starting value every pixel is filled with (Grid.cpp ctor).
+	static constexpr float INITIAL_RESOURCE = 100.0f;
 	std::vector<float> _resourceArray;
 	float resourceAt(int index);
 	void consumeResourceAt(int index, float amount);

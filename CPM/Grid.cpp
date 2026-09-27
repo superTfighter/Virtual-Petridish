@@ -1,6 +1,10 @@
 #include "Grid.h"
 #include <algorithm>
 
+// Out-of-class definition required in C++14 for a static constexpr member
+// that's ODR-used (e.g. bound to a const& parameter, as std::fill does).
+constexpr float Grid::INITIAL_RESOURCE;
+
 Grid::Grid(int xSize, int ySize)
 {
 	this->size = std::pair<int, int>(xSize, ySize);
@@ -16,7 +20,7 @@ Grid::Grid(int xSize, int ySize)
 	_pixelArray.resize(pointToIndex(size));
 
 	_resourceArray.resize(_pixelArray.size());
-	std::fill(_resourceArray.begin(), _resourceArray.end(), 100.0f);
+	std::fill(_resourceArray.begin(), _resourceArray.end(), Grid::INITIAL_RESOURCE);
 
 	this->middle = std::pair<int,int>(xSize / 2, ySize / 2);
 

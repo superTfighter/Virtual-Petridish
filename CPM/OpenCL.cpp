@@ -100,14 +100,21 @@ unsigned char* OpenCL::getRenderImage(CellularPotts* model, ActivityContraint* a
 	cl::Buffer stateBuf(context, 0, stateOfCell.size() * sizeof(cl_int));
 	queue.enqueueWriteBuffer(stateBuf, true, 0, stateOfCell.size() * sizeof(cl_int), stateOfCell.data());
 
+	// Resource is already stored per-pixel at the same padded stride as
+	// pixelsArray, so it can be uploaded directly -- no per-ID lookup needed.
+	cl::Buffer resourceBuf(context, 0, pixelArrayLength * sizeof(cl_float));
+	queue.enqueueWriteBuffer(resourceBuf, true, 0, pixelArrayLength * sizeof(cl_float), model->grid._resourceArray.data());
+
 	cl::Kernel kernel(program, "calculate", &err);
 	kernel.setArg(0, memBuf);
 	kernel.setArg(1, memBuf2);
 	kernel.setArg(2, kindBuf);
 	kernel.setArg(3, stateBuf);
-	kernel.setArg(4, sizeX);
-	kernel.setArg(5, sizeY);
-	kernel.setArg(6, y_bits);
+	kernel.setArg(4, resourceBuf);
+	kernel.setArg(5, (cl_float)Grid::INITIAL_RESOURCE);
+	kernel.setArg(6, sizeX);
+	kernel.setArg(7, sizeY);
+	kernel.setArg(8, y_bits);
 
 
 	auto maxBlockNumber = device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();

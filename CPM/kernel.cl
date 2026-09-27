@@ -7,7 +7,7 @@ __constant uchar4 kindPalette[] = {
 };
 #define KIND_PALETTE_SIZE 5
 
-__kernel void calculate(__global char* image,__global int* pixels, __global int* kindOfCell, __global int* stateOfCell, int sizeX, int sizeY, int y_bits)
+__kernel void calculate(__global char* image,__global int* pixels, __global int* kindOfCell, __global int* stateOfCell, __global float* resource, float maxResource, int sizeX, int sizeY, int y_bits)
 {
 	int global_id = get_global_id(0);
 
@@ -22,9 +22,17 @@ __kernel void calculate(__global char* image,__global int* pixels, __global int*
 
 	if(cellId == 0)
 	{
-		image[offset] = 255;
+		// Empty ground: white (barren) fading to a light green tint as the
+		// pixel's remaining nutrient/resource level rises toward maxResource
+		// (see Grid::INITIAL_RESOURCE / EatingConstraint). Not shown once a
+		// cell occupies the pixel -- cells always show their kind/state color.
+		float frac = maxResource > 0.0f ? resource[index] / maxResource : 0.0f;
+		if (frac < 0.0f) frac = 0.0f;
+		if (frac > 1.0f) frac = 1.0f;
+
+		image[offset] = 255 - (int)(55.0f * frac);
 		image[offset + 1] = 255;
-		image[offset + 2] = 255;
+		image[offset + 2] = 255 - (int)(55.0f * frac);
 		image[offset + 3] = 255;
 	}
 	else
