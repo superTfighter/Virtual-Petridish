@@ -2,10 +2,17 @@
 
 //imgui incudes
 #include "imgui.h"
+#ifdef _WIN32
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 #include <d3d11.h>
 #include <tchar.h>
+#else
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include <GLFW/glfw3.h>
+#include <GL/gl.h>
+#endif
 
 #include <iostream>
 #include <cstdint> // for specific size integers
@@ -20,6 +27,7 @@ constexpr int FLOAT_MAX = 1;
 
 //TODO:Finish persitence contraint
 
+#ifdef _WIN32
 // Data
 static ID3D11Device* g_pd3dDevice = NULL;
 static ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
@@ -32,12 +40,16 @@ void CleanupDeviceD3D();
 void CreateRenderTarget();
 void CleanupRenderTarget();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#else
+static void glfw_error_callback(int error, const char* description);
+#endif
 
 std::vector<std::thread> threadPool;
 
 // Main code
 int main(int, char**)
 {
+#ifdef _WIN32
 	// Create application window
 	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(NULL), NULL, NULL, NULL, NULL, _T("Virtual Petridish"), NULL };
 	::RegisterClassEx(&wc);
@@ -54,6 +66,22 @@ int main(int, char**)
 	// Show the window
 	::ShowWindow(hwnd, SW_SHOWDEFAULT);
 	::UpdateWindow(hwnd);
+#else
+	glfwSetErrorCallback(glfw_error_callback);
+	if (!glfwInit())
+		return 1;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	GLFWwindow* window = glfwCreateWindow(1280, 800, "Virtual Petridish - CellularPotts Model", NULL, NULL);
+	if (window == NULL)
+		return 1;
+
+	glfwMakeContextCurrent(window);
+	glfwSwapInterval(1); // enable vsync
+#endif
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -63,8 +91,13 @@ int main(int, char**)
 	ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer backends
+#ifdef _WIN32
 	ImGui_ImplWin32_Init(hwnd);
 	ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+#else
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 330");
+#endif
 
 	// Our state
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -77,16 +110,23 @@ int main(int, char**)
 	int width;
 	int height;
 
-
+#ifdef _WIN32
 	RECT rect;
 	if (GetWindowRect(hwnd, &rect))
 	{
 		width = rect.right - rect.left;
 		height = rect.bottom - rect.top;
 	}
+#else
+	glfwGetFramebufferSize(window, &width, &height);
+#endif
 
 	Simulation simulation = Simulation(&threadPool);
+#ifdef _WIN32
 	Display display = Display(g_pd3dDevice,&simulation);
+#else
+	Display display = Display(&simulation);
+#endif
 
 	display.setSize(width, height);
 
@@ -100,6 +140,7 @@ int main(int, char**)
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+#ifdef _WIN32
 		MSG msg;
 		while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
 		{
@@ -122,14 +163,34 @@ int main(int, char**)
 		}
 		if (done)
 			break;
+#else
+		glfwPollEvents();
+		if (glfwWindowShouldClose(window))
+			break;
+
+		int current_width, current_height;
+		glfwGetFramebufferSize(window, &current_width, &current_height);
+		if (current_width != width || current_height != height)
+		{
+			width = current_width;
+			height = current_height;
+			display.setSize(width, height);
+		}
+#endif
 
 		// Start the Dear ImGui frame
+#ifdef _WIN32
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
+#else
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+#endif
 
 		//THIS IS WHERE THE MAGIC HAPPEN
 		display.render();
 
+#ifdef _WIN32
 		const float clear_color_with_alpha[4] = { clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
 		g_pd3dDeviceContext->OMSetRenderTargets(1, &g_mainRenderTargetView, NULL);
 		g_pd3dDeviceContext->ClearRenderTargetView(g_mainRenderTargetView, clear_color_with_alpha);
@@ -139,16 +200,37 @@ int main(int, char**)
 
 		if(display.my_texture != nullptr)
 			display.my_texture->Release(); //FREE UP TEXTURE AFTER RENDER
+#else
+		glViewport(0, 0, width, height);
+		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
+		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwSwapBuffers(window);
+
+		if (display.my_texture != 0)
+			glDeleteTextures(1, &display.my_texture); //FREE UP TEXTURE AFTER RENDER
+#endif
 	}
 
 	// Cleanup
+#ifdef _WIN32
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
+#else
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+#endif
 	ImGui::DestroyContext();
 
+#ifdef _WIN32
 	CleanupDeviceD3D();
 	::DestroyWindow(hwnd);
 	::UnregisterClass(wc.lpszClassName, wc.hInstance);
+#else
+	glfwDestroyWindow(window);
+	glfwTerminate();
+#endif
 
 	int i = 0;
 	for (auto it = threadPool.begin(); it != threadPool.end(); ++it)
@@ -164,6 +246,7 @@ int main(int, char**)
 
 // Helper functions
 
+#ifdef _WIN32
 bool CreateDeviceD3D(HWND hWnd)
 {
 	// Setup swap chain
@@ -244,4 +327,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return ::DefWindowProc(hWnd, msg, wParam, lParam);
 }
+#else
+static void glfw_error_callback(int error, const char* description)
+{
+	std::cerr << "GLFW Error " << error << ": " << description << std::endl;
+}
+#endif
 

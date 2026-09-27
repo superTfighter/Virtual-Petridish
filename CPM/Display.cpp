@@ -1,6 +1,8 @@
 #include "Display.h"
 #include <iostream>
+#include <cstdint>
 
+#ifdef _WIN32
 Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
 {
 	this->g_pd3dDevice = g_pd3dDevice;
@@ -9,6 +11,14 @@ Display::Display(ID3D11Device* g_pd3dDevice, Simulation* simulation)
 
 	showExampleChooser = true;
 }
+#else
+Display::Display(Simulation* simulation)
+{
+	this->simulation = simulation;
+
+	showExampleChooser = true;
+}
+#endif
 
 int Display::render()
 {
@@ -82,7 +92,11 @@ void Display::showProject(int projectNumber)
 {
 	int my_image_width = 0;
 	int my_image_height = 0;
+#ifdef _WIN32
 	my_texture = NULL;
+#else
+	my_texture = 0;
+#endif
 	bool ret = LoadTexture(&my_texture, &my_image_width, &my_image_height);
 	IM_ASSERT(ret);
 
@@ -91,7 +105,11 @@ void Display::showProject(int projectNumber)
 	bool open = true;
 
 	ImGui::Begin("Simulation", &open, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+#ifdef _WIN32
 	ImGui::Image((void*)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
+#else
+	ImGui::Image((void*)(intptr_t)my_texture, ImVec2((width - (width * 0.3)) - 100, (height - (height * 0.2)))); //TODO: REVISE
+#endif
 
 	//ImGui::Image((void*)my_texture, ImVec2(my_image_width, my_image_height));
 	ImGui::End();
@@ -228,6 +246,7 @@ void Display::showStatistics()
 
 }
 
+#ifdef _WIN32
 bool Display::LoadTexture(ID3D11ShaderResourceView** out_srv, int* out_width, int* out_height)
 {
 	// Load from disk into a raw RGBA buffer
@@ -276,4 +295,29 @@ bool Display::LoadTexture(ID3D11ShaderResourceView** out_srv, int* out_width, in
 
 	return true;
 }
+#else
+bool Display::LoadTexture(unsigned int* out_tex, int* out_width, int* out_height)
+{
+	int image_width = this->simulation->getImageSize().first;
+	int image_height = this->simulation->getImageSize().second;
+	unsigned char* image_data = this->simulation->getImageData();
+	if (image_data == NULL)
+		return false;
+
+	GLuint tex;
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data);
+
+	*out_tex = tex;
+	*out_width = image_width;
+	*out_height = image_height;
+
+	delete [] image_data;
+
+	return true;
+}
+#endif
 

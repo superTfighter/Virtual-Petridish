@@ -1,4 +1,5 @@
 #include "OpenCL.h"
+#include <cassert>
 
 
 OpenCL::OpenCL()
@@ -12,7 +13,7 @@ OpenCL::OpenCL()
 
 	platform.getDevices(CL_DEVICE_TYPE_ALL, &devices);
 
-	_ASSERT(devices.size() >= 1);
+	assert(devices.size() >= 1);
 
 	std::cout << "Available devices: " << std::endl;
 
