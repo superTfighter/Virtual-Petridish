@@ -21,27 +21,22 @@ endif()
 
 set(CPM_DIR ${CMAKE_SOURCE_DIR}/CPM)
 
-add_executable(CPM
+# The simulation engine (model + constraints + OpenCL render pipeline),
+# split out from the ImGui/GLFW UI/windowing layer so it can be linked by
+# both the CPM app and the test suite without pulling in a window/GL
+# context. Same source files as always built into one executable --
+# nothing here changes runtime behavior, just how the sources are grouped.
+add_library(cpm_engine STATIC
     ${CPM_DIR}/ActivityContraint.cpp
     ${CPM_DIR}/AdhesionConstraint.cpp
     ${CPM_DIR}/Cell.cpp
     ${CPM_DIR}/CellularPotts.cpp
     ${CPM_DIR}/ChemotaxisConstraint.cpp
     ${CPM_DIR}/DiceSet.cpp
-    ${CPM_DIR}/Display.cpp
-    ${CPM_DIR}/DisplayHelper.cpp
     ${CPM_DIR}/EatingConstraint.cpp
     ${CPM_DIR}/Grid.cpp
     ${CPM_DIR}/GridManadger.cpp
     ${CPM_DIR}/HamiltonianConstraint.cpp
-    ${CPM_DIR}/imgui.cpp
-    ${CPM_DIR}/imgui_demo.cpp
-    ${CPM_DIR}/imgui_draw.cpp
-    ${CPM_DIR}/imgui_tables.cpp
-    ${CPM_DIR}/imgui_widgets.cpp
-    ${CPM_DIR}/imgui_impl_glfw.cpp
-    ${CPM_DIR}/imgui_impl_opengl3.cpp
-    ${CPM_DIR}/main.cpp
     ${CPM_DIR}/OpenCL.cpp
     ${CPM_DIR}/Parameters.cpp
     ${CPM_DIR}/PerimeterConstraint.cpp
@@ -54,13 +49,32 @@ add_executable(CPM
     ${CPM_DIR}/VolumeConstraint.cpp
 )
 
+target_include_directories(cpm_engine PUBLIC ${CPM_DIR} ${CPM_DIR}/include)
+
+target_link_libraries(cpm_engine PUBLIC
+    ${OPENCL_LIB}
+    Threads::Threads
+)
+
+add_executable(CPM
+    ${CPM_DIR}/Display.cpp
+    ${CPM_DIR}/DisplayHelper.cpp
+    ${CPM_DIR}/imgui.cpp
+    ${CPM_DIR}/imgui_demo.cpp
+    ${CPM_DIR}/imgui_draw.cpp
+    ${CPM_DIR}/imgui_tables.cpp
+    ${CPM_DIR}/imgui_widgets.cpp
+    ${CPM_DIR}/imgui_impl_glfw.cpp
+    ${CPM_DIR}/imgui_impl_opengl3.cpp
+    ${CPM_DIR}/main.cpp
+)
+
 target_include_directories(CPM PRIVATE ${CPM_DIR} ${CPM_DIR}/include)
 
 target_link_libraries(CPM PRIVATE
+    cpm_engine
     OpenGL::GL
     PkgConfig::GLFW
-    ${OPENCL_LIB}
-    Threads::Threads
 )
 
 # OpenCL.cpp loads the kernel via a cwd-relative std::ifstream("kernel.cl"),
@@ -70,3 +84,6 @@ add_custom_command(TARGET CPM POST_BUILD
         ${CPM_DIR}/kernel.cl
         $<TARGET_FILE_DIR:CPM>/kernel.cl
 )
+
+enable_testing()
+add_subdirectory(tests)

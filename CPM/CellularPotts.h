@@ -113,5 +113,21 @@ private:
 	// so it isn't a dangling pointer to a stack temporary that's already
 	// been destroyed by the time anyone dereferences it.
 	Parameters defaultParameters;
+
+#ifdef CPM_ENABLE_TEST_HOOKS
+	// docopy() implements the Metropolis acceptance criterion and has no
+	// other public surface to verify it through (tests/test_docopy.cpp
+	// regression-tests the exact bug fixed in feature_list.txt item 1).
+	// Gated behind a build-time macro (only defined for the test suite, see
+	// tests/CMakeLists.txt) so normal builds are completely unaffected.
+	friend bool testAccessDocopy(CellularPotts& model, float deltaH);
+#endif
 };
+
+#ifdef CPM_ENABLE_TEST_HOOKS
+inline bool testAccessDocopy(CellularPotts& model, float deltaH)
+{
+	return model.docopy(deltaH);
+}
+#endif
 

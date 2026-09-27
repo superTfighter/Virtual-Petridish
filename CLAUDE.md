@@ -62,19 +62,41 @@ Two parallel build systems are kept in sync (same source files, same
   anymore.
 
 ## Testing, linting, CI
-- **No test framework, no CI config, no linter/formatter config exist.**
-  The only formal "test" is `Simulation::testFunction()`, a debug stub
-  that just prints `" DONE"` — not a real test.
-- Verification in practice: build both configurations when touching
-  shared logic, run the app interactively, and — for changes to
-  `CellularPotts`/`Simulation`/constraint classes — compile a small
-  throwaway `main()` against the relevant `.cpp` files (outside the repo,
-  e.g. in a scratch dir) that constructs a `Simulation`, runs a scenario
-  headlessly for a bit, and asserts on `getCellCount()`/`getCellVolume()`/
-  `getImageData()` etc. This has repeatedly caught real bugs (a
-  self-deadlock, a crash-on-cell-death, incorrect physics) that a build-only
-  check would have missed. No such throwaway harness is checked into the
-  repo — write and discard one per verification pass.
+- **No CI config, no linter/formatter config exist**, but there IS a real,
+  checked-in test suite now: `tests/` (CMake + CTest), added as
+  `feature_list.txt` item 26. The Linux CMake build splits the simulation
+  engine (`CellularPotts`/`Grid`/constraints/`Parameters`/`OpenCL`) into a
+  `cpm_engine` STATIC library that both the `CPM` executable and every test
+  target link, so tests run headlessly with no window/GL context (only a
+  working OpenCL runtime, for the two tests that touch rendering). Build +
+  run: `cmake -S . -B build && cmake --build build -j && ctest --test-dir build --output-on-failure`.
+  5 executables, each its own CTest entry: `test_docopy` (Metropolis
+  acceptance criterion, via a `CPM_ENABLE_TEST_HOOKS`-gated friend accessor
+  to the private `docopy()`), `test_adhesion` (`AdhesionConstraint`
+  kind-vs-ID-invariance), `test_scenarios` (every demo scenario runs Monte
+  Carlo steps without throwing), `test_render` (`getImageData()` returns a
+  correctly-sized, actually-populated buffer), `test_gradient_constraints`
+  (`ResourceSeekingConstraint`/`ChemotaxisConstraint` bias direction, via
+  direct `deltaH()` calls rather than a stochastic simulation loop — see
+  the file's header comment for why: an earlier version drove
+  `monteCarloStep()` and measured centroid drift, which was flaky because
+  `CellularPotts`'s `rand()` usage is never re-seeded between models, so
+  the RNG's own centroid random-walk could swamp the constraint's actual
+  bias). `tests/test_framework.h` is a minimal custom `TEST_CASE`/`CHECK`/
+  `TEST_MAIN` framework with no external dependency, matching this
+  project's existing zero-dependency vendoring philosophy.
+- The Windows `.vcxproj` build is **not** wired to the test suite — it
+  still compiles one flat `CPM` executable with every source file, same as
+  before item 26. The test suite is Linux/CMake-only so far.
+- Beyond the checked-in suite: build both configurations when touching
+  shared logic, run the app interactively, and for anything not yet
+  covered by `tests/`, compile a small throwaway `main()` against the
+  relevant `.cpp` files (outside the repo, e.g. in a scratch dir) the same
+  way the checked-in tests do. This ad hoc approach — before item 26 — is
+  what caught several real bugs (a self-deadlock, a crash-on-cell-death,
+  incorrect physics) that a build-only check would have missed; prefer
+  adding a real `tests/` case over a throwaway script when the thing being
+  verified is worth protecting against regressing again.
 
 ## Code organization
 - All application source lives flat in one directory, `CPM/`, organized by
